@@ -1,3 +1,4 @@
+//SignInScreen.kt
 package com.example.vocab.screens
 
 import androidx.compose.foundation.layout.*
@@ -67,6 +68,7 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                             .addOnCompleteListener { task ->
                                 isLoading = false
                                 if (task.isSuccessful) {
+
                                     // Navigate to Main Screen
                                     navController.navigate(Screen.Home.route) {
                                         popUpTo(Screen.SignIn.route) { inclusive = true }

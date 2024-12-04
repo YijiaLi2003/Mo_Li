@@ -1,5 +1,6 @@
 package com.example.vocab.screens
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,12 +14,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.vocab.ui.theme.Screen
 import com.example.vocab.viewmodel.MainScreenViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.vocab.viewmodel.VocabularyViewModel
+import com.example.vocab.viewmodel.VocabularyViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -26,6 +30,9 @@ fun MainScreen(
     navController: NavHostController,
     mainScreenViewModel: MainScreenViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
 
@@ -38,6 +45,11 @@ fun MainScreen(
         }
         return
     }
+    val userId = currentUser.uid
+
+    val vocabularyViewModel: VocabularyViewModel = viewModel(
+        factory = VocabularyViewModelFactory(application, userId)
+    )
 
     // Observe ViewModel data
     val userName by mainScreenViewModel.userName.collectAsState()

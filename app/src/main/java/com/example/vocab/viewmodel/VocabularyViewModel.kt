@@ -1,28 +1,25 @@
 package com.example.vocab.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.test.core.app.ApplicationProvider
 import com.example.vocab.database.AppDatabase
 import com.example.vocab.model.QuizRecord
 import com.example.vocab.model.WordProgress
 import com.example.vocab.repository.VocabularyRepository
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
-class VocabularyViewModel : ViewModel() {
+class VocabularyViewModel(application: Application, private val userId: String) : AndroidViewModel(application) {
 
     private val repository: VocabularyRepository
-    private val userId: String
 
     init {
-        val database = AppDatabase.getDatabase(ApplicationProvider.getApplicationContext())
+        val database = AppDatabase.getDatabase(application)
         repository = VocabularyRepository(
             database.vocabularyDao(),
             database.wordProgressDao(),
             database.quizRecordDao()
         )
-        userId = FirebaseAuth.getInstance().currentUser?.uid ?: throw IllegalStateException("User not authenticated")
     }
 
     fun getWordProgress(wordId: Int, onResult: (WordProgress?) -> Unit) {

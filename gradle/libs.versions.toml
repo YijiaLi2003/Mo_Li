@@ -23,6 +23,7 @@ opencsv = "5.7.1"
 lifecycleViewmodelCompose = "2.8.7"
 playServicesAuth = "21.2.0"
 androidxCoreKtx = "1.6.1"
+uiDesktop = "1.7.0"
 
 [libraries]
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
@@ -51,6 +52,7 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidxCoreKtx" }
+androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 
 
 [plugins]
