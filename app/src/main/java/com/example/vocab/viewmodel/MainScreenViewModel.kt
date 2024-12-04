@@ -1,3 +1,4 @@
+//MainScreenViewModel.kt
 package com.example.vocab.viewmodel
 
 import androidx.lifecycle.ViewModel

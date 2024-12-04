@@ -1,3 +1,4 @@
+//QuizRecord.kt
 package com.example.vocab.model
 
 import androidx.room.Entity

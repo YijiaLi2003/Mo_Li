@@ -16,17 +16,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.vocab.dao.VocabularyDao
 import com.example.vocab.database.AppDatabase
-import com.example.vocab.model.Vocabulary
-import com.example.vocab.screens.BottomNavigationBar
-import com.example.vocab.screens.CommunityScreen
-import com.example.vocab.screens.LearningSection
-import com.example.vocab.screens.MainScreen
-import com.example.vocab.screens.ProfileScreen
-import com.example.vocab.screens.SearchScreen
-import com.example.vocab.screens.SplashScreen
+import com.example.vocab.screens.*
 import com.example.vocab.ui.theme.Screen
 import com.example.vocab.ui.theme.Vocab_Theme
 import com.example.vocab.viewmodel.SplashViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +28,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
 
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var vocabularyDao: VocabularyDao
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +39,9 @@ class MainActivity : ComponentActivity() {
         // Initialize DAOs
         val database = AppDatabase.getDatabase(this)
         vocabularyDao = database.vocabularyDao()
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
 
         // Import the vocabulary data
         lifecycleScope.launch {
@@ -61,10 +58,12 @@ class MainActivity : ComponentActivity() {
                 if (isSplashVisible) {
                     SplashScreen()
                 } else {
-                    // Define the routes where the bottom navigation bar should be hidden
-                    val hideBottomNavRoutes = listOf(Screen.LearningSection.route)
+                    val currentUser = auth.currentUser
 
-                    // Get the current route
+// Define the routes where the bottom navigation bar should be hidden
+                    val hideBottomNavRoutes = listOf(Screen.LearningSection.route, Screen.SignIn.route, Screen.SignUp.route)
+
+// Get the current route
                     val currentBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = currentBackStackEntry?.destination?.route
 
@@ -77,28 +76,36 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,
-                            startDestination = Screen.Home.route,
+                            startDestination = if (currentUser == null) Screen.SignIn.route else Screen.Home.route,
                             modifier = Modifier.padding(innerPadding)
                         ) {
+                            // Authentication Screens
+                            composable(Screen.SignIn.route) {
+                                SignInScreen(navController, auth)
+                            }
+                            composable(Screen.SignUp.route) {
+                                SignUpScreen(navController, auth)
+                            }
+
+                            // Main App Screens
                             composable(Screen.Home.route) { MainScreen(navController = navController) }
                             composable(Screen.Community.route) { CommunityScreen() }
                             composable(Screen.Search.route) { SearchScreen() }
-                            composable(Screen.Profile.route) { ProfileScreen() }
+                            composable(Screen.Profile.route) { ProfileScreen(auth, navController) }
                             composable(Screen.LearningSection.route) { LearningSection(navController = navController) }
                         }
                     }
+
                 }
             }
         }
-
     }
-
 
     private suspend fun importVocabularyFromCsv() {
         withContext(Dispatchers.IO) {
             val existingCount = vocabularyDao.getCount()
             if (existingCount > 0) {
-                // When Data already imported
+                // Data already imported
                 return@withContext
             }
 
@@ -115,7 +122,7 @@ class MainActivity : ComponentActivity() {
                     .build()
 
                 var nextLine: Array<String>?
-                val vocabularyList = mutableListOf<Vocabulary>()
+                val vocabularyList = mutableListOf<com.example.vocab.model.Vocabulary>()
                 while (true) {
                     nextLine = reader.readNext()
                     if (nextLine == null) {
@@ -128,7 +135,7 @@ class MainActivity : ComponentActivity() {
                     // The second field is the translation, possibly containing newlines
                     val translation = nextLine.getOrNull(1)?.trim() ?: ""
 
-                    val vocabulary = Vocabulary(
+                    val vocabulary = com.example.vocab.model.Vocabulary(
                         word = word,
                         translation = translation
                     )
@@ -146,7 +153,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-
-

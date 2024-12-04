@@ -1,3 +1,4 @@
+//BottomNavigationBar.kt
 package com.example.vocab.screens
 
 import androidx.compose.foundation.background
@@ -50,7 +51,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                                 }
                                 // Avoid multiple copies of the same destination
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
+                                // Restore state when re-selecting a previously selected item
                                 restoreState = true
                             }
                         }
@@ -60,7 +61,6 @@ fun BottomNavigationBar(navController: NavHostController) {
         }
     }
 }
-
 @Composable
 fun BottomNavItem(
     screen: Screen,
@@ -74,11 +74,13 @@ fun BottomNavItem(
             .padding(4.dp)
             .clickable { onClick() }
     ) {
-        Icon(
-            imageVector = screen.icon,
-            contentDescription = screen.title,
-            tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-        )
+        screen.icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = screen.title,
+                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+            )
+        }
         Text(
             text = screen.title,
             style = MaterialTheme.typography.bodySmall.copy(
@@ -98,6 +100,7 @@ fun BottomNavItem(
         }
     }
 }
+
 
 @Composable
 fun currentRoute(navController: NavHostController): String? {

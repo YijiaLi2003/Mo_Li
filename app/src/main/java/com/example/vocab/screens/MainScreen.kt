@@ -1,30 +1,15 @@
 package com.example.vocab.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,12 +19,26 @@ import androidx.navigation.NavHostController
 import com.example.vocab.ui.theme.Screen
 import com.example.vocab.viewmodel.MainScreenViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun MainScreen(
     navController: NavHostController,
     mainScreenViewModel: MainScreenViewModel = viewModel()
 ) {
+    val auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser
+
+    if (currentUser == null) {
+        // User is not authenticated, redirect to sign-in
+        LaunchedEffect(Unit) {
+            navController.navigate(Screen.SignIn.route) {
+                popUpTo(Screen.Home.route) { inclusive = true }
+            }
+        }
+        return
+    }
+
     // Observe ViewModel data
     val userName by mainScreenViewModel.userName.collectAsState()
     val currentWordBook by mainScreenViewModel.currentWordBook.collectAsState()
@@ -64,7 +63,6 @@ fun MainScreen(
     }
 }
 
-
 @Composable
 fun GreetingSection(userName: String) {
     Box(
@@ -84,7 +82,6 @@ fun GreetingSection(userName: String) {
         )
     }
 }
-
 
 @Composable
 fun ProgressCard(currentWordBook: String, progress: Float) {
@@ -109,7 +106,9 @@ fun ProgressCard(currentWordBook: String, progress: Float) {
                     imageVector = Icons.AutoMirrored.Outlined.MenuBook,
                     contentDescription = "Book",
                     tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(36.dp).align(Alignment.CenterVertically)
+                    modifier = Modifier
+                        .size(36.dp)
+                        .align(Alignment.CenterVertically)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -134,7 +133,7 @@ fun ProgressCard(currentWordBook: String, progress: Float) {
 
             LinearProgressIndicator(
                 progress = {
-                    progress // Updated to use dynamic progress!!!!!!!!!
+                    progress // Use the dynamic progress value
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -146,7 +145,6 @@ fun ProgressCard(currentWordBook: String, progress: Float) {
         }
     }
 }
-
 
 @Composable
 fun StartButton(onStartClick: () -> Unit) {

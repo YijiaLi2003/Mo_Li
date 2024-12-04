@@ -1,7 +1,9 @@
+//App Level
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -31,11 +33,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -54,7 +56,7 @@ dependencies {
     implementation(libs.androidx.core.ktx.v1101)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom.v20231000))
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
@@ -71,6 +73,12 @@ dependencies {
 
     // OpenCSV for CSV parsing
     implementation(libs.opencsv)
+
+    // Firebase Authentication
+    implementation(libs.firebase.auth.ktx)
+
+    // Google Sign-In
+    implementation(libs.play.services.auth)
 
     // Coroutine support
     implementation(libs.kotlinx.coroutines.android)
