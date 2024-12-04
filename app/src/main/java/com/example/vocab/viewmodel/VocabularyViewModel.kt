@@ -1,73 +1,64 @@
 package com.example.vocab.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.test.core.app.ApplicationProvider
 import com.example.vocab.database.AppDatabase
-import com.example.vocab.repository.VocabularyRepository
-import com.example.vocab.model.Vocabulary
+import com.example.vocab.model.QuizRecord
 import com.example.vocab.model.WordProgress
-import kotlinx.coroutines.Dispatchers
+import com.example.vocab.repository.VocabularyRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class VocabularyViewModel(application: Application) : AndroidViewModel(application) {
+class VocabularyViewModel : ViewModel() {
 
     private val repository: VocabularyRepository
+    private val userId: String
 
     init {
-        val database = AppDatabase.getDatabase(application)
+        val database = AppDatabase.getDatabase(ApplicationProvider.getApplicationContext())
         repository = VocabularyRepository(
             database.vocabularyDao(),
             database.wordProgressDao(),
             database.quizRecordDao()
         )
+        userId = FirebaseAuth.getInstance().currentUser?.uid ?: throw IllegalStateException("User not authenticated")
     }
 
-    fun getWordsToLearn(count: Int, onResult: (List<Vocabulary>) -> Unit) {
+    fun getWordProgress(wordId: Int, onResult: (WordProgress?) -> Unit) {
         viewModelScope.launch {
-            val words = withContext(Dispatchers.IO) {
-                val wordProgressList = repository.getWordsByStatus("unseen", count)
-                val wordIds = wordProgressList.map { it.wordId }
-
-                // Update status to 'learning' in WordProgress
-                wordProgressList.forEach {
-                    val updatedProgress = it.copy(status = "learning")
-                    repository.updateWordProgress(updatedProgress)
-                }
-
-                // Fetch Vocabulary entries
-                wordIds.mapNotNull { repository.getVocabularyById(it) }
-            }
-            onResult(words)
+            val progress = repository.getWordProgress(wordId, userId)
+            onResult(progress)
         }
     }
 
-    fun updateWordProgress(wordId: Int, knowsWord: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val wordProgress = repository.getWordProgressByWordId(wordId)
-            if (wordProgress != null) {
-                val updatedProgress = wordProgress.copy(
-                    isCorrect = knowsWord,
-                    status = if (knowsWord) "mastered" else "learning",
-                    quizAttempts = wordProgress.quizAttempts + 1,
-                    wrongCount = if (knowsWord) wordProgress.wrongCount else wordProgress.wrongCount + 1,
-                    lastUpdated = System.currentTimeMillis()
-                )
-                repository.updateWordProgress(updatedProgress)
-            } else {
-                val newProgress = WordProgress(
-                    wordId = wordId,
-                    isCorrect = knowsWord,
-                    status = if (knowsWord) "mastered" else "learning",
-                    quizAttempts = 1,
-                    wrongCount = if (knowsWord) 0 else 1,
-                    lastUpdated = System.currentTimeMillis()
-                )
-                repository.insertWordProgress(newProgress)
-            }
+    fun updateWordProgress(wordId: Int, isCorrect: Boolean) {
+        viewModelScope.launch {
+            val existingProgress = repository.getWordProgress(wordId, userId)
+            val newProgress = existingProgress?.copy(
+                isCorrect = isCorrect,
+                quizAttempts = existingProgress.quizAttempts + 1,
+                lastUpdated = System.currentTimeMillis()
+            ) ?: WordProgress(
+                wordId = wordId,
+                userId = userId,
+                isCorrect = isCorrect,
+                quizAttempts = 1
+            )
+            repository.insertWordProgress(newProgress)
         }
     }
 
+    fun recordQuiz(totalQuestions: Int, correctAnswers: Int, wrongAnswers: Int) {
+        viewModelScope.launch {
+            val quizRecord = QuizRecord(
+                userId = userId,
+                totalQuestions = totalQuestions,
+                correctAnswers = correctAnswers,
+                wrongAnswers = wrongAnswers
+            )
+            repository.insertQuizRecord(quizRecord)
+        }
+    }
 
 }

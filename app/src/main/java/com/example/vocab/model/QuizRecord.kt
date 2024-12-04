@@ -8,9 +8,10 @@ import androidx.room.PrimaryKey
 data class QuizRecord(
     @PrimaryKey(autoGenerate = true)
     val quizId: Int = 0,
-    val userId: String = "default_user",  // Placeholder for user ID
+    val userId: String,
     val dateTaken: Long = System.currentTimeMillis(),
     val totalQuestions: Int,
     val correctAnswers: Int,
     val wrongAnswers: Int
 )
+

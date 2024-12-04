@@ -11,6 +11,9 @@ interface QuizRecordDao {
     @Insert
     suspend fun insertQuizRecord(quizRecord: QuizRecord)
 
+    @Query("SELECT * FROM quiz_records WHERE userId = :userId ORDER BY dateTaken DESC")
+    suspend fun getQuizRecords(userId: String): List<QuizRecord>
+
     @Query("SELECT * FROM quiz_records WHERE quizId = :quizId")
     suspend fun getQuizRecordById(quizId: Int): QuizRecord?
 

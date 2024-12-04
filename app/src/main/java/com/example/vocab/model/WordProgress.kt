@@ -22,7 +22,7 @@ data class WordProgress(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val quizId: Int? = null,
-    val userId: String = "default_user",  // Placeholder for user ID
+    val userId: String,
     val wordId: Int,
     val isCorrect: Boolean = false,
     val status: String = "unseen",  // "unseen", "learning", "mastered"

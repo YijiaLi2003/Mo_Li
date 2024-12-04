@@ -9,6 +9,8 @@ import com.example.vocab.model.WordProgress
 
 @Dao
 interface WordProgressDao {
+    @Query("SELECT * FROM word_progress WHERE wordId = :wordId AND userId = :userId")
+    suspend fun getWordProgress(wordId: Int, userId: String): WordProgress?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWordProgress(wordProgress: WordProgress)
@@ -22,6 +24,7 @@ interface WordProgressDao {
     @Query("SELECT * FROM word_progress WHERE wordId = :wordId")
     suspend fun getWordProgressByWordId(wordId: Int): WordProgress?
 
-    @Query("SELECT * FROM word_progress WHERE status = :status LIMIT :limit")
-    suspend fun getWordsByStatus(status: String, limit: Int): List<WordProgress>
+    @Query("SELECT * FROM word_progress WHERE status = :status AND userId = :userId LIMIT :limit")
+    suspend fun getWordsByStatus(status: String, userId: String, limit: Int): List<WordProgress>
+
 }
