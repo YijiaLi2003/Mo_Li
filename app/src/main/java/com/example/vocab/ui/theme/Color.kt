@@ -2,10 +2,23 @@ package com.example.vocab.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+//global colors
+val yellow = Color(0xFFF1CC06)
+val dark_bg = Color(0xFF14161B)
+val light_bg = Color(0xFFF7F5EB)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+
+//dark mode colors
+val dark_tint = Color(0xFF1B1D25)
+
+val dark_text_white = Color(0xFFFFFFFF)
+val dark_text_grey = Color(0xFFE8E8DC)
+
+
+
+
+//light mode colors
+val light_tint = Color(0xFFF5EBE0)
+
+val light_text_black = Color(0xFF000000)
+val light_text_grey = Color(0xFFBBB5AC)

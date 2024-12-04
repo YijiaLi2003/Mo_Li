@@ -3,16 +3,37 @@ package com.example.vocab
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.example.vocab.database.AppDatabase
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.vocab.dao.VocabularyDao
+import com.example.vocab.database.AppDatabase
 import com.example.vocab.model.Vocabulary
+import com.example.vocab.screens.BottomNavigationBar
+import com.example.vocab.screens.CommunityScreen
+import com.example.vocab.screens.LearningSection
+import com.example.vocab.screens.MainScreen
+import com.example.vocab.screens.ProfileScreen
+import com.example.vocab.screens.SearchScreen
+import com.example.vocab.screens.SplashScreen
+import com.example.vocab.ui.theme.Screen
+import com.example.vocab.ui.theme.Vocab_Theme
+import com.example.vocab.viewmodel.SplashViewModel
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
+
 
 class MainActivity : ComponentActivity() {
 
@@ -31,9 +52,47 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            //Compose UI goes here
+            Vocab_Theme {
+                val splashViewModel: SplashViewModel = viewModel()
+
+                val isSplashVisible by splashViewModel.isSplashVisible.collectAsState()
+                val navController = rememberNavController()
+
+                if (isSplashVisible) {
+                    SplashScreen()
+                } else {
+                    // Define the routes where the bottom navigation bar should be hidden
+                    val hideBottomNavRoutes = listOf(Screen.LearningSection.route)
+
+                    // Get the current route
+                    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = currentBackStackEntry?.destination?.route
+
+                    Scaffold(
+                        bottomBar = {
+                            if (currentRoute !in hideBottomNavRoutes) {
+                                BottomNavigationBar(navController = navController)
+                            }
+                        }
+                    ) { innerPadding ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = Screen.Home.route,
+                            modifier = Modifier.padding(innerPadding)
+                        ) {
+                            composable(Screen.Home.route) { MainScreen(navController = navController) }
+                            composable(Screen.Community.route) { CommunityScreen() }
+                            composable(Screen.Search.route) { SearchScreen() }
+                            composable(Screen.Profile.route) { ProfileScreen() }
+                            composable(Screen.LearningSection.route) { LearningSection(navController = navController) }
+                        }
+                    }
+                }
+            }
         }
+
     }
+
 
     private suspend fun importVocabularyFromCsv() {
         withContext(Dispatchers.IO) {
@@ -87,3 +146,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+
+
