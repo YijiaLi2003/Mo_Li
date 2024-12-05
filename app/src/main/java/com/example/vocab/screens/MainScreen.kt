@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -89,8 +90,9 @@ fun GreetingSection(userName: String) {
     ) {
         Text(
             text = "Hi, $userName!",
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary),
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center).fillMaxWidth()
         )
     }
 }

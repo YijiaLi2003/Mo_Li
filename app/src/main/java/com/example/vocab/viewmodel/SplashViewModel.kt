@@ -17,7 +17,7 @@ class SplashViewModel : ViewModel() {
     init {
         // Launch a coroutine to hide the splash screen after a delay
         viewModelScope.launch {
-            delay(3000L) // 3-second delay
+            delay(2800L) // 2.8-second delay
             _isSplashVisible.value = false
         }
     }

@@ -25,4 +25,22 @@ sealed class Screen(
 
     data object SignUp : Screen("Sign_up")
     data object SignIn : Screen("sign_in")
+
+}
+
+sealed class ProfileSubScreen(val route: String) {
+    data object WordBooks : ProfileSubScreen("word_books")
+    data object FavouriteWords : ProfileSubScreen("favourite_words")
+    data object ReStudyWords : ProfileSubScreen("re_study_words")
+    data object WordNotes : ProfileSubScreen("word_notes")
+    data object LearningData : ProfileSubScreen("learning_data")
+    data object Settings : ProfileSubScreen("settings")
+}
+
+sealed class LearnInLandscape(val route: String){
+    data object LandScapeLearn : LearnInLandscape("landscape_learn")
+}
+
+sealed class LearnInPortrait(val route: String){
+    data object PortraitLearn : LearnInPortrait("portrait_learn")
 }

@@ -99,6 +99,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.firebase.auth.ktx)
 
+    //word learning details Accompanist
+    implementation (libs.accompanist.pager)
+    implementation (libs.accompanist.pager.indicators)
+
     // Testing libraries
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

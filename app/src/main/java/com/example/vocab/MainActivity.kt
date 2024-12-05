@@ -1,13 +1,16 @@
 package com.example.vocab
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -17,6 +20,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.vocab.dao.VocabularyDao
 import com.example.vocab.database.AppDatabase
 import com.example.vocab.screens.*
+import com.example.vocab.screens.profile_sub.*
+import com.example.vocab.screens.learn_landscape.*
+import com.example.vocab.screens.learn_portrait.*
+import com.example.vocab.ui.theme.LearnInLandscape
+import com.example.vocab.ui.theme.LearnInPortrait
+import com.example.vocab.ui.theme.ProfileSubScreen
 import com.example.vocab.ui.theme.Screen
 import com.example.vocab.ui.theme.Vocab_Theme
 import com.example.vocab.viewmodel.SplashViewModel
@@ -27,6 +36,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
+
+@Composable
+fun isLandscape(): Boolean {
+    val configuration = LocalConfiguration.current
+    return configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+}
+
+
 
 class MainActivity : ComponentActivity() {
 
@@ -60,8 +77,13 @@ class MainActivity : ComponentActivity() {
                 } else {
                     val currentUser = auth.currentUser
 
-                    // Define the routes where the bottom navigation bar should be hidden
-                    val hideBottomNavRoutes = listOf(Screen.LearningSection.route, Screen.SignIn.route, Screen.SignUp.route)
+                    // Define the routes where the bottom navigation bar should be shown
+                    val showBottomNavRoutes = listOf(
+                        Screen.Home.route,
+                        Screen.Community.route,
+                        Screen.Search.route,
+                        Screen.Profile.route
+                    )
 
                     // Get the current route
                     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -69,7 +91,7 @@ class MainActivity : ComponentActivity() {
 
                     Scaffold(
                         bottomBar = {
-                            if (currentRoute !in hideBottomNavRoutes) {
+                            if (currentRoute in showBottomNavRoutes) {
                                 BottomNavigationBar(navController = navController)
                             }
                         }
@@ -92,7 +114,22 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Community.route) { CommunityScreen() }
                             composable(Screen.Search.route) { SearchScreen() }
                             composable(Screen.Profile.route) { ProfileScreen(auth, navController) }
+
+                            // Profile Sub-Screens
+                            composable(ProfileSubScreen.WordBooks.route) { WordBooksScreen(navController = navController) }
+                            composable(ProfileSubScreen.FavouriteWords.route) { FavouriteWordsScreen(navController = navController) }
+                            composable(ProfileSubScreen.ReStudyWords.route) { ReStudyWordsScreen(navController = navController) }
+                            composable(ProfileSubScreen.WordNotes.route) { WordNotesScreen(navController = navController) }
+                            composable(ProfileSubScreen.LearningData.route) { LearningDataScreen(navController = navController) }
+                            composable(ProfileSubScreen.Settings.route) { SettingsScreen(navController = navController) }
+
+                            //learning start point
                             composable(Screen.LearningSection.route) { LearningSection(navController = navController) }
+
+                            //LearnInLandscape
+                            composable(LearnInLandscape.LandScapeLearn.route) { LearningInLandScreen(navController = navController) }
+                            //LearnInPortrait
+                            composable(LearnInPortrait.PortraitLearn.route) { LearningInPortScreen(navController = navController) }
                         }
                     }
 
