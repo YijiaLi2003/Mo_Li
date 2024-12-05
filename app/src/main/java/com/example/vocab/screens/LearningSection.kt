@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.NoteAlt
+import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +46,7 @@ import com.example.vocab.isLandscape
 import com.example.vocab.ui.theme.LearnInLandscape
 import com.example.vocab.ui.theme.LearnInPortrait
 import com.example.vocab.ui.theme.ProfileSubScreen
+import com.example.vocab.ui.theme.Quiz
 import com.example.vocab.viewmodel.LearningSectionViewModel
 
 
@@ -253,7 +255,7 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                                 color = MaterialTheme.colorScheme.surface,
                                 shape = RoundedCornerShape(25.dp)
                             )
-                            .clickable { navController.navigate(ProfileSubScreen.WordNotes.route) },
+                            .clickable { navController.navigate(Quiz.QuizTaking.route) },
                         contentAlignment = Alignment.Center
 
                     ) {
@@ -264,13 +266,13 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                         )
                         {
                             Icon(
-                                imageVector = Icons.Outlined.NoteAlt,
-                                contentDescription = "word_notes",
+                                imageVector = Icons.Outlined.Quiz,
+                                contentDescription = "quiz",
                                 tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.size(36.dp)
                             )
                             Text(
-                                text = "Word Notes",
+                                text = "Quiz",
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
                                 modifier = Modifier.fillMaxWidth()
@@ -412,7 +414,7 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                                     color = MaterialTheme.colorScheme.surface,
                                     shape = RoundedCornerShape(25.dp)
                                 )
-                                .clickable { navController.navigate(ProfileSubScreen.WordNotes.route) },
+                                .clickable { navController.navigate(Quiz.QuizTaking.route) },
                             contentAlignment = Alignment.Center
 
                         ) {
@@ -423,13 +425,13 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                             )
                             {
                                 Icon(
-                                    imageVector = Icons.Outlined.NoteAlt,
-                                    contentDescription = "word_notes",
+                                    imageVector = Icons.Outlined.Quiz,
+                                    contentDescription = "quiz",
                                     tint = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.size(36.dp)
                                 )
                                 Text(
-                                    text = "Word Notes",
+                                    text = "Quiz",
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
                                     modifier = Modifier.fillMaxWidth()

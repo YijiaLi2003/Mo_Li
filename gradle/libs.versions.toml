@@ -29,20 +29,18 @@ retrofit = "2.9.0"
 okhttp = "4.9.3"
 coroutines = "1.9.0"
 exoplayer = "2.19.1"
-firebaseDatabaseKtx = "20.2.2"
-firebase-bom = "33.7.0"
+runtimeSaveable = "1.7.5"
 firebaseFirestoreKtx = "25.1.1"
-accompanist = "0.36.0"
+firebase-bom = "33.7.0"
 
 [libraries]
-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
-accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist" }
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPagerIndicators" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-core-ktx-v1101 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-runtime-saveable = { module = "androidx.compose.runtime:runtime-saveable", version.ref = "runtimeSaveable" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
-firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
-google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -70,8 +68,11 @@ squareup-retrofit2-converter-moshi = { module = "com.squareup.retrofit2:converte
 squareup-okhttp3-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 google-exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
+google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -44,3 +44,7 @@ sealed class LearnInLandscape(val route: String){
 sealed class LearnInPortrait(val route: String){
     data object PortraitLearn : LearnInPortrait("portrait_learn")
 }
+
+sealed class Quiz(val route: String){
+    data object QuizTaking : Quiz("quiz_taking")
+}

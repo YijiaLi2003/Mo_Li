@@ -109,6 +109,9 @@ dependencies {
     implementation(libs.google.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom))
 
+    //list saver
+    implementation (libs.androidx.runtime.saveable)
+
     // Testing libraries
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

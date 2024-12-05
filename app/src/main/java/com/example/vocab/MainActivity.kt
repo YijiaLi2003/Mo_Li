@@ -24,11 +24,6 @@ import com.example.vocab.screens.*
 import com.example.vocab.screens.profile_sub.*
 import com.example.vocab.screens.learn_landscape.*
 import com.example.vocab.screens.learn_portrait.*
-import com.example.vocab.ui.theme.LearnInLandscape
-import com.example.vocab.ui.theme.LearnInPortrait
-import com.example.vocab.ui.theme.ProfileSubScreen
-import com.example.vocab.ui.theme.Screen
-import com.example.vocab.ui.theme.Vocab_Theme
 import com.example.vocab.viewmodel.SplashViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.opencsv.CSVParserBuilder
@@ -37,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
+import com.example.vocab.ui.theme.*
 
 @Composable
 fun isLandscape(): Boolean {
@@ -131,6 +127,9 @@ class MainActivity : ComponentActivity() {
                             composable(LearnInLandscape.LandScapeLearn.route) { LearningInLandScreen(navController = navController) }
                             //LearnInPortrait
                             composable(LearnInPortrait.PortraitLearn.route) { LearningInPortScreen(navController = navController) }
+
+                            //Quiz
+                            composable(Quiz.QuizTaking.route) { QuizScreen(navController = navController) }
                         }
                     }
 
