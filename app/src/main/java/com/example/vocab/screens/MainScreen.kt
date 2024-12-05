@@ -49,7 +49,7 @@ fun MainScreen(
     val userId = currentUser.uid
 
     val vocabularyViewModel: VocabularyViewModel = viewModel(
-        factory = VocabularyViewModelFactory(application, userId)
+        factory = VocabularyViewModelFactory(application)
     )
 
     // Observe ViewModel data
@@ -183,3 +183,4 @@ fun StartButton(onStartClick: () -> Unit) {
         )
     }
 }
+

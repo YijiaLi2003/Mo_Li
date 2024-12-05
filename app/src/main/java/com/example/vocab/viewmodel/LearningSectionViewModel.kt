@@ -19,7 +19,7 @@ class LearningSectionViewModel : ViewModel() {
             // Simulate network delay
             delay(1000L)
             // TODO: Fetch data from backend and update _bookName and _progressPercentage
-            _bookName.value = "GRE Core 1800" // Example fetched data
+            _bookName.value = "TOEFL" // Example fetched data
             _progressPercentage.value = 0.84f // Example fetched data
         }
     }

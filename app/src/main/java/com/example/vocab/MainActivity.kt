@@ -1,3 +1,4 @@
+//MainActivity.kt
 package com.example.vocab
 
 import android.content.res.Configuration

@@ -1,25 +1,41 @@
+// SignInScreen.kt
 package com.example.vocab.screens
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vocab.model.WordProgress
 import com.example.vocab.ui.theme.Screen
+import com.example.vocab.viewmodel.VocabularyViewModel
+import com.example.vocab.viewmodel.VocabularyViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val vocabularyViewModel: VocabularyViewModel = viewModel(
+        factory = VocabularyViewModelFactory(application)
+    )
+    val coroutineScope = rememberCoroutineScope()
 
     // Email validation regex
     val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
@@ -40,18 +56,7 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                TopAppBar(
-                    title = { "Sign In"},
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        navigationIconContentColor = MaterialTheme.colorScheme.secondary
-                    )
-                )
+
 
                 Text("Sign In", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -93,15 +98,36 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                                 isLoading = true
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
-                                        isLoading = false
                                         if (task.isSuccessful) {
-                                            // Navigate to Main Screen
-                                            navController.navigate(Screen.Home.route) {
-                                                popUpTo(Screen.SignIn.route) { inclusive = true }
+                                            val currentUser = auth.currentUser
+                                            val userId = currentUser?.uid
+                                            if (userId != null) {
+                                                coroutineScope.launch {
+                                                    val result = downloadWordProgressFromFirebase(
+                                                        userId,
+                                                        vocabularyViewModel
+                                                    )
+                                                    isLoading = false
+                                                    result.fold(
+                                                        onSuccess = {
+                                                            // Navigate to Main Screen
+                                                            navController.navigate(Screen.Home.route) {
+                                                                popUpTo(Screen.SignIn.route) { inclusive = true }
+                                                            }
+                                                        },
+                                                        onFailure = { error ->
+                                                            errorMessage =
+                                                                "Failed to download data: ${error.message}"
+                                                        }
+                                                    )
+                                                }
+                                            } else {
+                                                isLoading = false
+                                                errorMessage = "Failed to retrieve user ID."
                                             }
                                         } else {
-                                            errorMessage =
-                                                task.exception?.message ?: "Authentication failed."
+                                            isLoading = false
+                                            errorMessage = task.exception?.message ?: "Authentication failed."
                                         }
                                     }
                             }
@@ -120,4 +146,53 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
             }
         }
     }
+}
+
+suspend fun downloadWordProgressFromFirebase(
+    userId: String,
+    vocabularyViewModel: VocabularyViewModel
+): Result<Unit> {
+    return try {
+        val firestore = FirebaseFirestore.getInstance()
+        val wordProgressCollection = firestore.collection("users")
+            .document(userId)
+            .collection("word_progress")
+
+        // Fetch remote word progress data
+        val snapshot = withContext(Dispatchers.IO) {
+            wordProgressCollection.get().await()
+        }
+        val remoteWordProgressList = snapshot.documents.mapNotNull { document ->
+            document.toObject(WordProgress::class.java)
+        }
+
+        // Fetch local word progress data
+        val localWordProgressList = vocabularyViewModel.getAllWordProgress(userId)
+
+        // Merge remote and local data
+        val mergedList = mergeWordProgressData(localWordProgressList, remoteWordProgressList)
+
+        // Update local database with merged data
+        vocabularyViewModel.insertWordProgressList(mergedList)
+
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
+
+fun mergeWordProgressData(
+    localList: List<WordProgress>,
+    remoteList: List<WordProgress>
+): List<WordProgress> {
+    val mergedMap = localList.associateBy { it.wordId }.toMutableMap()
+
+    for (remoteProgress in remoteList) {
+        val localProgress = mergedMap[remoteProgress.wordId]
+        if (localProgress == null || remoteProgress.lastUpdated > localProgress.lastUpdated) {
+            mergedMap[remoteProgress.wordId] = remoteProgress
+        }
+    }
+
+    return mergedMap.values.toList()
 }

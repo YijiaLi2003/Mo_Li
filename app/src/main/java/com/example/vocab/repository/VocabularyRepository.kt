@@ -1,5 +1,7 @@
+//Vocabulary Repository
 package com.example.vocab.repository
 
+import androidx.lifecycle.LiveData
 import com.example.vocab.dao.VocabularyDao
 import com.example.vocab.dao.WordProgressDao
 import com.example.vocab.dao.QuizRecordDao
@@ -47,5 +49,15 @@ class VocabularyRepository(
     suspend fun getQuizRecords(userId: String): List<QuizRecord> {
         return quizRecordDao.getQuizRecords(userId)
     }
+
+    suspend fun insertWordProgressList(wordProgressList: List<WordProgress>) {
+        wordProgressDao.insertAll(wordProgressList)
+    }
+
+    suspend fun getAllWordProgress(userId: String): List<WordProgress> {
+        return wordProgressDao.getAllWordProgress(userId)
+    }
+
+
 
 }

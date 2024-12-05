@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.firebase.firestore.ktx)
     ksp(libs.androidx.room.compiler)
 
 // Retrofit and Converter
@@ -102,6 +103,11 @@ dependencies {
     //word learning details Accompanist
     implementation (libs.accompanist.pager)
     implementation (libs.accompanist.pager.indicators)
+
+    //Firebase data storage
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(platform(libs.firebase.bom))
 
     // Testing libraries
     testImplementation(libs.junit)

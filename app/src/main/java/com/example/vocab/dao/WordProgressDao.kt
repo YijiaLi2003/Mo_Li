@@ -27,4 +27,11 @@ interface WordProgressDao {
     @Query("SELECT * FROM word_progress WHERE status = :status AND userId = :userId LIMIT :limit")
     suspend fun getWordsByStatus(status: String, userId: String, limit: Int): List<WordProgress>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(wordProgressList: List<WordProgress>)
+
+    @Query("SELECT * FROM word_progress WHERE userId = :userId")
+    suspend fun getAllWordProgress(userId: String): List<WordProgress>
+
+
 }

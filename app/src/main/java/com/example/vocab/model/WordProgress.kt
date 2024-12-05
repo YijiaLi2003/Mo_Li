@@ -1,4 +1,3 @@
-//WordProgress.kt
 package com.example.vocab.model
 
 import androidx.room.Entity
@@ -20,14 +19,17 @@ import androidx.room.PrimaryKey
 )
 data class WordProgress(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val quizId: Int? = null,
-    val userId: String,
-    val wordId: Int,
-    val isCorrect: Boolean = false,
-    val status: String = "unseen",  // "unseen", "learning", "mastered"
-    val quizAttempts: Int = 0,
-    val wrongCount: Int = 0,
-    val needsReview: Boolean = false,
-    val lastUpdated: Long = System.currentTimeMillis()
-)
+    var id: Int = 0,
+    var quizId: Int? = null,
+    var userId: String = "",
+    var wordId: Int = 0,
+    var isCorrect: Boolean = false,
+    var status: String = "unseen",  // "unseen", "learning", "mastered"
+    var quizAttempts: Int = 0,
+    var wrongCount: Int = 0,
+    var needsReview: Boolean = false,
+    var lastUpdated: Long = System.currentTimeMillis()
+) {
+    // No-argument constructor for Firebase serialization
+    constructor() : this(0, null, "", 0)
+}
