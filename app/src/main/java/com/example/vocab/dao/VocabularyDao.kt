@@ -24,4 +24,12 @@ interface VocabularyDao {
 
     @Query("SELECT * FROM vocabulary WHERE id = :id")
     suspend fun getVocabularyById(id: Int): Vocabulary?
+
+    @Query("""
+    SELECT * FROM vocabulary
+    WHERE word LIKE '%' || :query || '%' 
+       OR translation LIKE '%' || :query || '%'
+""")
+    suspend fun searchVocabulary(query: String): List<Vocabulary>
+
 }

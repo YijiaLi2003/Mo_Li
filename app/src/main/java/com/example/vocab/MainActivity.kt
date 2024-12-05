@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                             // Main App Screens
                             composable(Screen.Home.route) { MainScreen(navController = navController) }
 //                            composable(Screen.Community.route) { CommunityScreen() }
-                            composable(Screen.Search.route) { SearchScreen() }
+                            composable(Screen.Search.route) { SearchScreen(navController = navController) }
                             composable(Screen.Profile.route) { ProfileScreen(auth, navController) }
 
                             // Profile Sub-Screens

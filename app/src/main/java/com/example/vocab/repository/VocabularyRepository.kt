@@ -8,6 +8,7 @@ import com.example.vocab.dao.QuizRecordDao
 import com.example.vocab.model.QuizRecord
 import com.example.vocab.model.Vocabulary
 import com.example.vocab.model.WordProgress
+import com.example.vocab.viewmodel.WordItem
 
 class VocabularyRepository(
     private val vocabularyDao: VocabularyDao,
@@ -56,6 +57,31 @@ class VocabularyRepository(
 
     suspend fun getAllWordProgress(userId: String): List<WordProgress> {
         return wordProgressDao.getAllWordProgress(userId)
+    }
+
+    suspend fun searchWords(queryValue: String, statusValue: String?, userId: String): List<WordItem> {
+        val vocabList = vocabularyDao.searchVocabulary(queryValue)
+        val wordItems = mutableListOf<WordItem>()
+
+        for (vocab in vocabList) {
+            val wp = wordProgressDao.getWordProgress(vocab.id, userId)
+            if (wp != null) {
+                // 3. Check status filter
+                // If statusValue is null or "all", no filter on status
+                if (statusValue == null || statusValue == "all" || wp.status == statusValue) {
+                    wordItems.add(
+                        WordItem(
+                            wordId = vocab.id,
+                            word = vocab.word,
+                            translation = vocab.translation,
+                            status = wp.status
+                        )
+                    )
+                }
+            }
+        }
+
+        return wordItems
     }
 
 
