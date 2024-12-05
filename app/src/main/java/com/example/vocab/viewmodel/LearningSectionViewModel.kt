@@ -37,12 +37,10 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         val db = AppDatabase.getDatabase(application)
         repository = VocabularyRepository(db.vocabularyDao(), db.wordProgressDao(), db.quizRecordDao())
 
-        // Obtain userId from Firebase Authentication
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         userId = uid ?: "defaultUser"
 
         viewModelScope.launch {
-            // Fixed book name "TOEFL"
             _bookName.value = "TOEFL"
 
             // 1. Fetch words with status = 'unseen'
@@ -120,10 +118,9 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
 
         docRef.set(wordProgress)
             .addOnSuccessListener {
-                // handle success if needed
             }
             .addOnFailureListener { e ->
-                // handle failure, consider retry or logging
+                // TODO handle failure
             }
     }
 }

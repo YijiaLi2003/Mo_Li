@@ -323,7 +323,7 @@ fun LearningInLandScreen(
                                             modifier = Modifier
                                                 .size(36.dp)
                                                 .clickable {
-                                                    // Handle Pronunciation API if any
+                                                    // TODO Handle Pronunciation API if any
                                                 }
                                         )
                                         Spacer(modifier = Modifier.width(16.dp))
@@ -334,7 +334,7 @@ fun LearningInLandScreen(
                                             modifier = Modifier
                                                 .size(36.dp)
                                                 .clickable {
-                                                    // Handle save to favourite word list if any
+                                                    // TODO Handle save to favourite word list if any
                                                 }
                                         )
                                     }
@@ -438,7 +438,7 @@ fun LearningInLandScreen(
                 val pagerState = rememberPagerState()
 
                 HorizontalPager(
-                    count = wordsState.size, // Correct parameter for Accompanist
+                    count = wordsState.size,
                     state = pagerState,
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
