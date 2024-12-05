@@ -1,7 +1,8 @@
-//SignInScreen.kt
 package com.example.vocab.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,12 +13,16 @@ import androidx.navigation.NavController
 import com.example.vocab.ui.theme.Screen
 import com.google.firebase.auth.FirebaseAuth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    // Email validation regex
+    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -35,6 +40,19 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                TopAppBar(
+                    title = { "Sign In"},
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        navigationIconContentColor = MaterialTheme.colorScheme.secondary
+                    )
+                )
+
                 Text("Sign In", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -63,20 +81,31 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
 
                 Button(
                     onClick = {
-                        isLoading = true
-                        auth.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                isLoading = false
-                                if (task.isSuccessful) {
-
-                                    // Navigate to Main Screen
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo(Screen.SignIn.route) { inclusive = true }
-                                    }
-                                } else {
-                                    errorMessage = task.exception?.message ?: "Authentication failed."
-                                }
+                        // Validate inputs
+                        when {
+                            email.isBlank() || password.isBlank() -> {
+                                errorMessage = "Email and password must not be empty."
                             }
+                            !email.matches(emailRegex) -> {
+                                errorMessage = "Invalid email format."
+                            }
+                            else -> {
+                                isLoading = true
+                                auth.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        isLoading = false
+                                        if (task.isSuccessful) {
+                                            // Navigate to Main Screen
+                                            navController.navigate(Screen.Home.route) {
+                                                popUpTo(Screen.SignIn.route) { inclusive = true }
+                                            }
+                                        } else {
+                                            errorMessage =
+                                                task.exception?.message ?: "Authentication failed."
+                                        }
+                                    }
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

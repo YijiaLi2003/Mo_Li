@@ -20,7 +20,7 @@ fun SplashScreen() {
     ) {
         Text(
             text = "You\nAre\nWorking\nHard!",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

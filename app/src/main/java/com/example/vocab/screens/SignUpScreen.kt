@@ -2,6 +2,8 @@
 package com.example.vocab.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +14,7 @@ import androidx.navigation.NavController
 import com.example.vocab.ui.theme.Screen
 import com.google.firebase.auth.FirebaseAuth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
@@ -19,6 +22,9 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    // Email validation regex
+    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -36,6 +42,19 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                TopAppBar(
+                    title = { "Sign Up"},
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        navigationIconContentColor = MaterialTheme.colorScheme.secondary
+                    )
+                )
+
                 Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -74,8 +93,16 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
 
                 Button(
                     onClick = {
+                        if (!email.matches(emailRegex)) {
+                            errorMessage = "Invalid email format."
+                            return@Button
+                        }
                         if (password != confirmPassword) {
                             errorMessage = "Passwords do not match."
+                            return@Button
+                        }
+                        if (email.isBlank() || password.isBlank()) {
+                            errorMessage = "Email and password must not be empty."
                             return@Button
                         }
                         isLoading = true

@@ -60,10 +60,10 @@ class MainActivity : ComponentActivity() {
                 } else {
                     val currentUser = auth.currentUser
 
-// Define the routes where the bottom navigation bar should be hidden
+                    // Define the routes where the bottom navigation bar should be hidden
                     val hideBottomNavRoutes = listOf(Screen.LearningSection.route, Screen.SignIn.route, Screen.SignUp.route)
 
-// Get the current route
+                    // Get the current route
                     val currentBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = currentBackStackEntry?.destination?.route
 
