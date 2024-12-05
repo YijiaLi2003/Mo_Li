@@ -17,10 +17,13 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "OXFORD_APP_ID", "\"${System.getenv("OXFORD_APP_ID")}\"")
+        buildConfigField("String", "OXFORD_APP_KEY", "\"${System.getenv("OXFORD_APP_KEY")}\"")
     }
 
     buildTypes {
@@ -41,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -64,7 +68,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation (libs.androidx.lifecycle.viewmodel.compose)
     implementation (libs.androidx.navigation.compose)
-    
 
     // Room components
     implementation(libs.androidx.room.runtime)
@@ -72,17 +75,29 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     ksp(libs.androidx.room.compiler)
 
+// Retrofit and Converter
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.retrofit2.converter.moshi)
+
+// OkHttp for logging (optional)
+    implementation(libs.squareup.okhttp3.logging.interceptor)
+
+// Coroutines and Flow
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
     // OpenCSV for CSV parsing
     implementation(libs.opencsv)
 
-    // Firebase Authentication
-    implementation(libs.firebase.auth.ktx)
+// ExoPlayer for audio playback
+    implementation(libs.google.exoplayer)
 
     // Google Sign-In
     implementation(libs.play.services.auth)
 
     // Coroutine support
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.firebase.auth.ktx)
 
     // Testing libraries
     testImplementation(libs.junit)
