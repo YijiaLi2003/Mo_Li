@@ -60,6 +60,7 @@ fun LearningInLandScreen(
     val bookName by learningViewModel.bookName.collectAsState()
     val progressPercentage by learningViewModel.progressPercentage.collectAsState()
     val words by learningViewModel.words.collectAsState()
+    val loading by learningViewModel.loading.collectAsState()
 
     var showDetails by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -72,7 +73,6 @@ fun LearningInLandScreen(
 
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    // Load initial progress
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             val savedIndex = fetchProgressFromDatabase(context)
@@ -82,7 +82,6 @@ fun LearningInLandScreen(
         }
     }
 
-    // When leaving the screen, save progress
     DisposableEffect(Unit) {
         onDispose {
             coroutineScope.launch(Dispatchers.IO) {
@@ -238,190 +237,211 @@ fun LearningInLandScreen(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (words.isEmpty()) {
-                    Text("No words available", color = MaterialTheme.colorScheme.secondary)
-                } else {
-                    val currentWordItem = words[currentIndex]
-                    Row {
-                        // Left part
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.6f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                        ) {
+                when {
+                    loading -> {
+                        CircularProgressIndicator()
+                    }
+
+                    words.isEmpty() -> {
+                        Text("No words available", color = MaterialTheme.colorScheme.secondary)
+                    }
+
+                    else -> {
+                        val currentWordItem = words[currentIndex]
+                        Row {
+                            // Left part
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)
+                                    .fillMaxWidth()
+                                    .weight(0.6f)
                                     .background(
                                         color = MaterialTheme.colorScheme.surface,
                                         shape = RoundedCornerShape(20.dp)
                                     )
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surface,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                 ) {
-                                    Text(
-                                        text = bookName,
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.align(Alignment.Start)
-                                    )
-
-                                    // Progress Bar
-                                    LinearProgressIndicator(
-                                        progress = { progressPercentage },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(8.dp)
-                                            .clip(RoundedCornerShape(4.dp)),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                                    )
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
                                     ) {
                                         Text(
-                                            text = "${(progressPercentage * 100).toInt()}%",
-                                            style = MaterialTheme.typography.bodyLarge.copy(
-                                                color = MaterialTheme.colorScheme.tertiary
+                                            text = bookName,
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.align(Alignment.Start)
+                                        )
+
+                                        // Progress Bar
+                                        LinearProgressIndicator(
+                                            progress = { progressPercentage },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(8.dp)
+                                                .clip(RoundedCornerShape(4.dp)),
+                                            color = MaterialTheme.colorScheme.primary,
+                                            trackColor = MaterialTheme.colorScheme.onBackground.copy(
+                                                alpha = 0.3f
                                             ),
-                                            modifier = Modifier.align(Alignment.BottomEnd)
                                         )
-                                    }
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "${(progressPercentage * 100).toInt()}%",
+                                                style = MaterialTheme.typography.bodyLarge.copy(
+                                                    color = MaterialTheme.colorScheme.tertiary
+                                                ),
+                                                modifier = Modifier.align(Alignment.BottomEnd)
+                                            )
+                                        }
 
-                                    Spacer(modifier = Modifier.height(40.dp))
+                                        Spacer(modifier = Modifier.height(40.dp))
 
-                                    Text(
-                                        text = currentWordItem.word,
-                                        style = MaterialTheme.typography.headlineLarge,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    Text(
-                                        text = currentWordItem.translation,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.tertiary
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
-                                            contentDescription = "Pronunciation",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier
-                                                .size(36.dp)
-                                                .clickable {
-                                                    // TODO Handle Pronunciation API if any
-                                                }
+                                        Text(
+                                            text = currentWordItem.word,
+                                            style = MaterialTheme.typography.headlineLarge,
+                                            color = MaterialTheme.colorScheme.secondary
                                         )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Icon(
-                                            imageVector = Icons.Outlined.StarOutline,
-                                            contentDescription = "Favourite",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier
-                                                .size(36.dp)
-                                                .clickable {
-                                                    // TODO Handle save to favourite word list if any
-                                                }
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Text(
+                                            text = currentWordItem.translation,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.tertiary
                                         )
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
+                                                contentDescription = "Pronunciation",
+                                                tint = MaterialTheme.colorScheme.secondary,
+                                                modifier = Modifier
+                                                    .size(36.dp)
+                                                    .clickable {
+                                                        // TODO Handle Pronunciation API if any
+                                                    }
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            Icon(
+                                                imageVector = Icons.Outlined.StarOutline,
+                                                contentDescription = "Favourite",
+                                                tint = MaterialTheme.colorScheme.secondary,
+                                                modifier = Modifier
+                                                    .size(36.dp)
+                                                    .clickable {
+                                                        // TODO Handle save to favourite word list if any
+                                                    }
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        // Right part
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.4f)
-                        ) {
-                            Column(
+                            // Right part
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 28.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                                    .fillMaxWidth()
+                                    .weight(0.4f)
                             ) {
-                                Spacer(modifier = Modifier.weight(0.15f))
-
-                                // Learn box (status -> learning)
-                                Box(
+                                Column(
                                     modifier = Modifier
-                                        .padding(horizontal = 32.dp)
-                                        .fillMaxWidth()
-                                        .weight(0.3f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .border(
-                                            width = 3.dp,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable {
-                                            // Update status to "learning"
-                                            coroutineScope.launch {
-                                                learningViewModel.updateWordStatus(currentWordItem.wordId, "learning")
-                                            }
-                                            showDetails = true
-                                        }
+                                        .fillMaxSize()
+                                        .padding(horizontal = 28.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
                                 ) {
-                                    Text(
-                                        text = "Learn",
-                                        style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
+                                    Spacer(modifier = Modifier.weight(0.15f))
+
+                                    // Learn box (status -> learning)
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 32.dp)
+                                            .fillMaxWidth()
+                                            .weight(0.3f)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surface,
+                                                shape = RoundedCornerShape(20.dp)
+                                            )
+                                            .border(
+                                                width = 3.dp,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = RoundedCornerShape(20.dp)
+                                            )
+                                            .clickable {
+                                                // Update status to "learning"
+                                                coroutineScope.launch {
+                                                    learningViewModel.updateWordStatus(
+                                                        currentWordItem.wordId,
+                                                        "learning"
+                                                    )
+                                                }
+                                                showDetails = true
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "Learn",
+                                            style = MaterialTheme.typography.headlineLarge.copy(
+                                                color = MaterialTheme.colorScheme.secondary
+                                            ),
+                                            modifier = Modifier.align(Alignment.Center)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.weight(0.1f))
+
+                                    // I Know box (status -> mastered)
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 32.dp)
+                                            .fillMaxWidth()
+                                            .weight(0.3f)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surface,
+                                                shape = RoundedCornerShape(20.dp)
+                                            )
+                                            .border(
+                                                width = 3.dp,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = RoundedCornerShape(20.dp)
+                                            )
+                                            .clickable {
+                                                coroutineScope.launch {
+                                                    learningViewModel.updateWordStatus(
+                                                        currentWordItem.wordId,
+                                                        "mastered"
+                                                    )
+                                                }
+                                                if (words.isNotEmpty() && currentIndex < words.size - 1) {
+                                                    currentIndex =
+                                                        (currentIndex + 1).coerceAtMost(words.size - 1)
+                                                }
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "I Know",
+                                            style = MaterialTheme.typography.headlineLarge.copy(
+                                                color = MaterialTheme.colorScheme.secondary
+                                            ),
+                                            modifier = Modifier.align(Alignment.Center)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.weight(0.15f))
                                 }
 
-                                Spacer(modifier = Modifier.weight(0.1f))
-
-                                // I Know box (status -> mastered)
-                                Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 32.dp)
-                                        .fillMaxWidth()
-                                        .weight(0.3f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .border(
-                                            width = 3.dp,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable {
-                                            coroutineScope.launch {
-                                                learningViewModel.updateWordStatus(currentWordItem.wordId, "mastered")
-                                            }
-                                            if (words.isNotEmpty() && currentIndex < words.size - 1) {
-                                                currentIndex = (currentIndex + 1).coerceAtMost(words.size - 1)
-                                            }
-                                        }
-                                ) {
-                                    Text(
-                                        text = "I Know",
-                                        style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.weight(0.15f))
                             }
-
                         }
                     }
                 }

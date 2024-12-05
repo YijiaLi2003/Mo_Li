@@ -33,6 +33,10 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
     private val _words = MutableStateFlow<List<WordItem>>(emptyList())
     val words: StateFlow<List<WordItem>> = _words
 
+    // Loading state
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading
+
     init {
         val db = AppDatabase.getDatabase(application)
         repository = VocabularyRepository(db.vocabularyDao(), db.wordProgressDao(), db.quizRecordDao())
@@ -43,20 +47,14 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         viewModelScope.launch {
             _bookName.value = "TOEFL"
 
-            // 1. Fetch words with status = 'unseen'
             val unseenProgressList = repository.getWordsByStatus("unseen", userId, Int.MAX_VALUE)
-
-            // 2. Update these words to 'learning'
             for (wp in unseenProgressList) {
                 val updated = wp.copy(status = "learning", lastUpdated = System.currentTimeMillis())
                 repository.updateWordProgress(updated)
                 uploadWordProgressToFirebase(updated)
             }
 
-            // After updating them to learning, fetch them again or just reuse them
             val learningWordsProgress = repository.getWordsByStatus("learning", userId, Int.MAX_VALUE)
-
-            // Join with vocabulary to get word and translation
             val wordItems = mutableListOf<WordItem>()
             for (wp in learningWordsProgress) {
                 val vocab = repository.getVocabularyById(wp.wordId)
@@ -73,9 +71,10 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             }
 
             _words.value = wordItems
-
-            // Calculate progress
             recalculateProgress()
+
+            // Data loaded
+            _loading.value = false
         }
     }
 
@@ -88,7 +87,6 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
     }
 
     suspend fun updateWordStatus(wordId: Int, newStatus: String) {
-        // Fetch current WordProgress
         val currentProgress = repository.getWordProgress(wordId, userId)
         if (currentProgress != null) {
             val updated = currentProgress.copy(
@@ -98,13 +96,10 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             repository.updateWordProgress(updated)
             uploadWordProgressToFirebase(updated)
 
-            // Update local list
             val updatedList = _words.value.map { item ->
                 if (item.wordId == wordId) item.copy(status = newStatus) else item
             }
             _words.value = updatedList
-
-            // Recalculate progress
             recalculateProgress()
         }
     }
@@ -117,10 +112,5 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             .document(wordProgress.wordId.toString())
 
         docRef.set(wordProgress)
-            .addOnSuccessListener {
-            }
-            .addOnFailureListener { e ->
-                // TODO handle failure
-            }
     }
 }
