@@ -20,7 +20,6 @@ import com.example.vocab.ui.theme.Screen
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Home,
-        Screen.Community,
         Screen.Search,
         Screen.Profile
     )

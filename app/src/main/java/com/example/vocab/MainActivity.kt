@@ -77,7 +77,6 @@ class MainActivity : ComponentActivity() {
                     // Define the routes where the bottom navigation bar should be shown
                     val showBottomNavRoutes = listOf(
                         Screen.Home.route,
-                        Screen.Community.route,
                         Screen.Search.route,
                         Screen.Profile.route
                     )
@@ -108,7 +107,7 @@ class MainActivity : ComponentActivity() {
 
                             // Main App Screens
                             composable(Screen.Home.route) { MainScreen(navController = navController) }
-                            composable(Screen.Community.route) { CommunityScreen() }
+//                            composable(Screen.Community.route) { CommunityScreen() }
                             composable(Screen.Search.route) { SearchScreen() }
                             composable(Screen.Profile.route) { ProfileScreen(auth, navController) }
 
