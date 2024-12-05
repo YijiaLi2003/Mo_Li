@@ -100,9 +100,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.firebase.auth.ktx)
 
-    //word learning details Accompanist
-    implementation (libs.accompanist.pager)
-    implementation (libs.accompanist.pager.indicators)
+    // Word learning details Accompanist
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
 
     //Firebase data storage
     implementation(libs.firebase.database.ktx)

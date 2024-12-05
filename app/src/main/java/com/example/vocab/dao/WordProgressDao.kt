@@ -1,3 +1,4 @@
+//wordProgress_dao.kt
 package com.example.vocab.dao
 
 import androidx.room.Dao

@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.automirrored.outlined.Note
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.NoteAlt
 import androidx.compose.material.icons.outlined.StarOutline
