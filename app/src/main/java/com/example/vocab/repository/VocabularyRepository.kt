@@ -66,8 +66,6 @@ class VocabularyRepository(
         for (vocab in vocabList) {
             val wp = wordProgressDao.getWordProgress(vocab.id, userId)
             if (wp != null) {
-                // 3. Check status filter
-                // If statusValue is null or "all", no filter on status
                 if (statusValue == null || statusValue == "all" || wp.status == statusValue) {
                     wordItems.add(
                         WordItem(

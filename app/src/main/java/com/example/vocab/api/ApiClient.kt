@@ -16,7 +16,6 @@ object ApiClient {
         level = HttpLoggingInterceptor.Level.BODY  // Set to Level.NONE in production
     }
 
-    // Interceptor to add headers
     private val headerInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
             .addHeader("Accept", "application/json")
@@ -26,13 +25,11 @@ object ApiClient {
         chain.proceed(request)
     }
 
-    // Build OkHttpClient
     private val httpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor(headerInterceptor)
         .build()
 
-    // Build Retrofit instance
     val oxfordApi: OxfordDictionaryApi = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(httpClient)
