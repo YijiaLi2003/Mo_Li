@@ -245,7 +245,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             modifier = Modifier.size(36.dp)
                                         )
                                         Text(
-                                            text = "Re-Study Words",
+                                            text = "Words Need Review",
                                             textAlign = TextAlign.Center,
                                             style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                             modifier = Modifier.fillMaxWidth()
@@ -476,7 +476,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             modifier = Modifier.size(36.dp)
                                         )
                                         Text(
-                                            text = "Re-Study Words",
+                                            text = "Words Need Review",
                                             textAlign = TextAlign.Center,
                                             style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                             modifier = Modifier.fillMaxWidth()

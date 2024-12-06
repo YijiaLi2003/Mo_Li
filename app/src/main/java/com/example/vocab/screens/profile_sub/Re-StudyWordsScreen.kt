@@ -32,7 +32,7 @@ fun ReStudyWordsScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Re-Study Words")
+                    Text(text = "Words Need Review")
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
