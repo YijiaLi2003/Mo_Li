@@ -96,16 +96,6 @@ fun QuizScreen(
     val currentWord = words[currentIndex]
     val bookName = "TOEFL"
 
-    // Lock orientation to landscape if requested
-    if (context is Activity) {
-        SideEffect {
-            context.requestedOrientation = if (isLandscape) {
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-        }
-    }
 
     if (!isLandscape) {
         // Portrait mode layout
