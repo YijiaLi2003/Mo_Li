@@ -65,7 +65,8 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -75,7 +76,8 @@ fun SignInScreen(navController: NavController, auth: FirebaseAuth) {
                     onValueChange = { password = it },
                     label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

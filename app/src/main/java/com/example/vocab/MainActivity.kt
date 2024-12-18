@@ -111,7 +111,6 @@ class MainActivity : ComponentActivity() {
 
                             // Main App Screens
                             composable(Screen.Home.route) { MainScreen(navController = navController) }
-//                            composable(Screen.Community.route) { CommunityScreen() }
                             composable(Screen.Search.route) { SearchScreen(navController = navController) }
                             composable(Screen.Profile.route) { ProfileScreen(auth, navController) }
 
@@ -119,7 +118,6 @@ class MainActivity : ComponentActivity() {
                             composable(ProfileSubScreen.WordBooks.route) { WordBooksScreen(navController = navController) }
                             composable(ProfileSubScreen.FavouriteWords.route) { FavouriteWordsScreen(navController = navController) }
                             composable(ProfileSubScreen.ReStudyWords.route) { ReStudyWordsScreen(navController = navController) }
-                            composable(ProfileSubScreen.WordNotes.route) { WordNotesScreen(navController = navController) }
                             composable(ProfileSubScreen.LearningData.route) { LearningDataScreen(navController = navController) }
                             composable(ProfileSubScreen.Settings.route) { SettingsScreen(navController = navController) }
 

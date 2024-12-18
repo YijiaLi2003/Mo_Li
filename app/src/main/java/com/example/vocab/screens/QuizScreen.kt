@@ -56,10 +56,7 @@ fun isLandscape(): Boolean {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizScreen(
-    navController: NavHostController,
-    quizViewModel: QuizViewModel = viewModel()
-) {
+fun QuizScreen(navController: NavHostController, quizViewModel: QuizViewModel = viewModel()) {
     val context = LocalContext.current
     val isLandscape = isLandscape()
 
@@ -274,7 +271,7 @@ fun QuizScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    // Previous word box (Currently just a placeholder)
+                    // Previous word box
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

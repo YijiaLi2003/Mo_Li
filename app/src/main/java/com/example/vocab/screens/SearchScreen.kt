@@ -1,7 +1,9 @@
 package com.example.vocab.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +24,15 @@ import com.example.vocab.viewmodel.WordItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 
+@SuppressLint("RememberReturnType")
 @Composable
 fun SearchScreen(
     navController: NavHostController,
@@ -44,9 +54,23 @@ fun SearchScreen(
         }
     }
 
+    val focusManager = LocalFocusManager.current
+
+    // clear focus and hide keyboard when clicking outside the input field
+    val outerModifier = Modifier
+        .fillMaxSize()
+        .clickable(
+            // ensures clicking outside text field removes focus
+            onClick = {
+                focusManager.clearFocus()
+            },
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() }
+        )
+
     if (!landscape){
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = outerModifier
         ) {
             // Box instead of top app bar
             Box(
@@ -119,7 +143,7 @@ fun SearchScreen(
         }
     } else{
 
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = outerModifier) {
             // Left Pane (35%)
             Column(
                 modifier = Modifier
@@ -219,7 +243,10 @@ fun SearchBar(
             value = query,
             onValueChange = { onQueryChange(it) },
             label = { Text("Search for a word (Chinese or English)") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                ,
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary),
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.Search,

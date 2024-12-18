@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -78,7 +79,8 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -88,7 +90,8 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
                     onValueChange = { password = it },
                     label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -98,7 +101,8 @@ fun SignUpScreen(navController: NavController, auth: FirebaseAuth) {
                     onValueChange = { confirmPassword = it },
                     label = { Text("Confirm Password") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.secondary)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

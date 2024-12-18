@@ -50,6 +50,7 @@ import com.example.vocab.ui.theme.ProfileSubScreen
 import com.example.vocab.ui.theme.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.example.vocab.isLandscape
+import androidx.compose.ui.*
 
 
 
@@ -76,17 +77,33 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ){
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 180.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = backgroundImage),
-                    contentDescription = "Profile Background",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+            if (isLandscape){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 100.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = backgroundImage),
+                        contentDescription = "Profile Background",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.TopCenter
+                    )
+                }
+            }else{
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 180.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = backgroundImage),
+                        contentDescription = "Profile Background",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -261,41 +278,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
 
                                 Box(
                                     modifier = Modifier
-                                        .padding(end = 8.dp)
                                         .padding(start = 16.dp)
-                                        .weight(0.5f)
-                                        .aspectRatio(1.618f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable { navController.navigate(ProfileSubScreen.WordNotes.route) },
-                                    contentAlignment = Alignment.Center
-
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Outlined.NoteAlt,
-                                            contentDescription = "Word Notes",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
-                                        )
-                                        Text(
-                                            text = "Word Notes",
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
                                         .padding(end = 8.dp)
                                         .weight(0.5f)
                                         .aspectRatio(1.618f)
@@ -329,7 +312,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                 }
                                 Box(
                                     modifier = Modifier
-                                        .padding(end = 16.dp)
+                                        .padding(end = 8.dp)
                                         .padding(start = 8.dp)
                                         .weight(0.5f)
                                         .aspectRatio(1.618f)
@@ -358,6 +341,22 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                             modifier = Modifier.fillMaxWidth()
                                         )
+                                    }
+                                }
+                                // serve as a placeholder
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 16.dp)
+                                        .padding(start = 8.dp)
+                                        .weight(0.5f)
+                                        .aspectRatio(1.618f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.background,
+                                        )
+                                ) {
+                                    Row(modifier = Modifier.fillMaxWidth(),)
+                                    {
+                                        Text(text = "")
                                     }
                                 }
                             }
@@ -485,48 +484,8 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                 }
                                 Box(
                                     modifier = Modifier
-                                        .padding(end = 16.dp)
                                         .padding(start = 8.dp)
-                                        .weight(0.5f)
-                                        .aspectRatio(1.618f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable { navController.navigate(ProfileSubScreen.WordNotes.route) },
-                                    contentAlignment = Alignment.Center
-
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Outlined.NoteAlt,
-                                            contentDescription = "Word Notes",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
-                                        )
-                                        Text(
-                                            text = "Word Notes",
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-
-                                Box(
-                                    modifier = Modifier
-                                        .padding(start = 16.dp)
-                                        .padding(end = 8.dp)
+                                        .padding(end = 16.dp)
                                         .weight(0.5f)
                                         .aspectRatio(1.618f)
                                         .background(
@@ -557,6 +516,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                         )
                                     }
                                 }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .padding(end = 16.dp)
@@ -590,8 +554,30 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                         )
                                     }
                                 }
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp)
+                                        .padding(end = 8.dp)
+                                        .weight(0.5f)
+                                        .aspectRatio(1.618f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.background,
+                                        ),
+                                    contentAlignment = Alignment.Center,
+
+                                    ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    )
+                                    {
+                                        Text(text = "") // serve as a placeholder
+                                    }
+                                }
 
                             }
+
                         }
                     }
 
