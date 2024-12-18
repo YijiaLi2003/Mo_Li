@@ -33,6 +33,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import android.media.MediaPlayer
+import java.io.File
+
+fun playAudioFromFile(file: File) {
+    val mediaPlayer = MediaPlayer()
+    mediaPlayer.setDataSource(file.absolutePath)
+    mediaPlayer.prepare()
+    mediaPlayer.start()
+}
+
+
 private suspend fun fetchProgressFromDatabase(context: android.content.Context): Int? {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return null
     val db = com.example.vocab.database.AppDatabase.getDatabase(context)
@@ -235,11 +246,14 @@ fun LearningInPortScreen(
                                             imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
                                             contentDescription = "Pronunciation",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier
-                                                .size(36.dp)
-                                                .clickable {
-                                                    // TODO: Handle Pronunciation API if any
+                                            modifier = Modifier.size(36.dp).clickable {
+                                                val file = File(context.filesDir, "${currentWord.word}.mp3")
+                                                if (file.exists()) {
+                                                    playAudioFromFile(file)
+                                                } else {
+                                                    // File not cached, optionally fetch again or show error
                                                 }
+                                            }
                                         )
                                         Spacer(modifier = Modifier.width(16.dp))
                                         Icon(

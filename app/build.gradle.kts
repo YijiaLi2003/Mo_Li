@@ -1,4 +1,5 @@
-//App Level
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,13 +18,10 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "OXFORD_APP_ID", "\"${System.getenv("OXFORD_APP_ID")}\"")
-        buildConfigField("String", "OXFORD_APP_KEY", "\"${System.getenv("OXFORD_APP_KEY")}\"")
     }
 
     buildTypes {
@@ -66,9 +64,9 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
-    implementation (libs.androidx.lifecycle.viewmodel.compose)
-    implementation (libs.androidx.navigation.compose)
-    implementation (libs.androidx.ui.text)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.ui.text)
 
     // Room components
     implementation(libs.androidx.room.runtime)
@@ -77,21 +75,21 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     ksp(libs.androidx.room.compiler)
 
-// Retrofit and Converter
+    // Retrofit and Converter
     implementation(libs.squareup.retrofit2)
     implementation(libs.squareup.retrofit2.converter.moshi)
 
-// OkHttp for logging (optional)
+    // OkHttp for logging (optional)
     implementation(libs.squareup.okhttp3.logging.interceptor)
 
-// Coroutines and Flow
+    // Coroutines and Flow
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
     // OpenCSV for CSV parsing
     implementation(libs.opencsv)
 
-// ExoPlayer for audio playback
+    // ExoPlayer for audio playback
     implementation(libs.google.exoplayer)
 
     // Google Sign-In
@@ -105,13 +103,13 @@ dependencies {
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
 
-    //Firebase data storage
+    // Firebase data storage
     implementation(libs.firebase.database.ktx)
     implementation(libs.google.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom))
 
-    //list saver
-    implementation (libs.androidx.runtime.saveable)
+    // List saver
+    implementation(libs.androidx.runtime.saveable)
 
     // Testing libraries
     testImplementation(libs.junit)
