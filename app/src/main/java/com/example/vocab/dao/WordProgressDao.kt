@@ -1,4 +1,4 @@
-//wordProgress_dao.kt
+// WordProgressDao.kt
 package com.example.vocab.dao
 
 import androidx.room.Dao
@@ -34,5 +34,7 @@ interface WordProgressDao {
     @Query("SELECT * FROM word_progress WHERE userId = :userId")
     suspend fun getAllWordProgress(userId: String): List<WordProgress>
 
-
+    // New query to fetch favorite words
+    @Query("SELECT * FROM word_progress WHERE isFavorite = 1 AND userId = :userId")
+    suspend fun getFavoriteWords(userId: String): List<WordProgress>
 }

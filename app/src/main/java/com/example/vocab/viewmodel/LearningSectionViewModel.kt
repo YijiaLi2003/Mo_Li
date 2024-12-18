@@ -1,10 +1,10 @@
+// LearningSectionViewModel.kt
 package com.example.vocab.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocab.database.AppDatabase
-import com.example.vocab.model.UserProgress
 import com.example.vocab.model.WordProgress
 import com.example.vocab.repository.VocabularyRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -12,14 +12,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 data class WordItem(
     val wordId: Int,
     val word: String,
     val translation: String,
-    val status: String // "unseen", "learning", "mastered"
+    val status: String, // "unseen", "learning", "mastered"
+    val isFavorite: Boolean = false
 )
 
 class LearningSectionViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,6 +40,9 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
 
     private val _desiredWordCount = MutableStateFlow<Int?>(null)
     val desiredWordCount: StateFlow<Int?> = _desiredWordCount
+
+    private val _favoriteWords = MutableStateFlow<List<WordItem>>(emptyList())
+    val favoriteWords: StateFlow<List<WordItem>> = _favoriteWords
 
     init {
         val db = AppDatabase.getDatabase(application)
@@ -80,7 +82,8 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
                             wordId = wp.wordId,
                             word = vocab.word,
                             translation = vocab.translation,
-                            status = wp.status // remains 'unseen'
+                            status = wp.status, // remains 'unseen'
+                            isFavorite = wp.isFavorite
                         )
                     )
                 }
@@ -95,7 +98,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    private suspend fun recalculateProgress() {
+    private fun recalculateProgress() {
         val allProgress = _words.value
         val count = _desiredWordCount.value
 
@@ -146,8 +149,45 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             _desiredWordCount.value = null
             _words.value = emptyList()
             _progressPercentage.value = 0f
-            _bookName.value = "Select the number of words to learn"
+            _bookName.value = "Select the number of words you want to learn"
             _loading.value = false
+        }
+    }
+
+    // New function to load favorite words
+    private fun loadFavoriteWords() {
+        viewModelScope.launch {
+            val favoriteWordProgressList = repository.getFavoriteWords(userId)
+            val favoriteWordItems = favoriteWordProgressList.map { wp ->
+                val vocab = repository.getVocabularyById(wp.wordId)
+                WordItem(
+                    wordId = wp.wordId,
+                    word = vocab?.word ?: "",
+                    translation = vocab?.translation ?: "",
+                    status = wp.status,
+                    isFavorite = wp.isFavorite
+                )
+            }
+            _favoriteWords.value = favoriteWordItems
+        }
+    }
+
+    // New function to toggle favorite status
+    fun toggleFavorite(wordId: Int) {
+        viewModelScope.launch {
+            val wordProgress = repository.getWordProgress(wordId, userId)
+            if (wordProgress != null) {
+                val newFavoriteStatus = !wordProgress.isFavorite
+                val updatedWordProgress = wordProgress.copy(isFavorite = newFavoriteStatus)
+                repository.updateWordProgress(updatedWordProgress)
+                uploadWordProgressToFirebase(updatedWordProgress)
+                // Update the _words list
+                _words.value = _words.value.map { item ->
+                    if (item.wordId == wordId) item.copy(isFavorite = newFavoriteStatus) else item
+                }
+                // Reload favorite words
+                loadFavoriteWords()
+            }
         }
     }
 

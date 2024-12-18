@@ -28,6 +28,7 @@ data class WordProgress(
     var quizAttempts: Int = 0,
     var wrongCount: Int = 0,
     var needsReview: Boolean = false,
+    var isFavorite: Boolean = false, // New field
     var lastUpdated: Long = System.currentTimeMillis()
 ) {
     // No-argument constructor for Firebase serialization

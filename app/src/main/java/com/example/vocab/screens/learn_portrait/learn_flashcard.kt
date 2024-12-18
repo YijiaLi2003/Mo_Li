@@ -1,3 +1,4 @@
+// LearningInPortScreen.kt
 package com.example.vocab.screens.learn_portrait
 
 import android.app.Activity
@@ -5,45 +6,17 @@ import android.content.pm.ActivityInfo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.VolumeUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -163,7 +136,9 @@ fun LearningInPortScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             LinearProgressIndicator(
-                                progress = progressPercentage, // Correct: Float value
+                                progress = {
+                                    progressPercentage // Correct: Float value
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(8.dp)
@@ -181,7 +156,8 @@ fun LearningInPortScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.secondary
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(48.dp)
                         )
                     }
                 },
@@ -200,177 +176,139 @@ fun LearningInPortScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            if (loading) {
-                CircularProgressIndicator()
-            } else if (words.isEmpty()) {
-                Text(
-                    "No words available",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            } else {
-                // Main Content
-                val currentWord = words.getOrNull(currentIndex)
+            when {
+                loading -> {
+                    CircularProgressIndicator()
+                }
 
-                if (currentWord == null) {
+                words.isEmpty() -> {
                     Text(
-                        "Invalid word index",
+                        "No words available",
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(20.dp)
-                            )
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                }
 
-                        // Top Area: Current Word
-                        Box(
-                            modifier = Modifier.weight(0.2f)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = currentWord.word,
-                                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp),
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
-                                        contentDescription = "Pronunciation",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clickable {
-                                                // TODO: Handle Pronunciation API if any
-                                            }
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Icon(
-                                        imageVector = Icons.Outlined.StarOutline,
-                                        contentDescription = "Favourite",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clickable {
-                                                // TODO: Handle save to favourite word list if any
-                                            }
-                                    )
-                                }
-                            }
-                        }
+                else -> {
+                    // Main Content
+                    val currentWord = words.getOrNull(currentIndex)
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Middle Area
-                        Box(
+                    if (currentWord == null) {
+                        Text(
+                            "Invalid word index",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.65f)
+                                .fillMaxSize()
+                                .padding(16.dp)
                                 .background(
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.surface,
                                     shape = RoundedCornerShape(20.dp)
                                 )
-                                .clickable {
-                                    // Update status to "learning"
-                                    coroutineScope.launch {
-                                        learningViewModel.updateWordStatus(
-                                            currentWord.wordId,
-                                            "learning"
-                                        )
-                                    }
-                                    // Show learn content
-                                    showLearnContent = true
-                                },
-                            contentAlignment = Alignment.Center
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            if (showLearnContent) {
-                                // Detailed Learn Content once "Learn" is clicked
-                                Text(
-                                    text = "Detailed Learn Content TODO!!!!",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            } else {
-                                // Default eye icon
-                                Icon(
-                                    imageVector = Icons.Outlined.RemoveRedEye,
-                                    contentDescription = "Tap to see",
-                                    tint = MaterialTheme.colorScheme.tertiary,
-                                    modifier = Modifier.size(26.dp)
-                                )
-                            }
-                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Bottom area: "I Know" and "Learn" or "Next"
-                        Box(
-                            modifier = Modifier.weight(0.15f)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                            // Top Area: Current Word
+                            Box(
+                                modifier = Modifier.weight(0.2f)
                             ) {
-                                // "I Know" box
-                                Box(
-                                    modifier = Modifier
-                                        .weight(0.3f)
-                                        .height(80.dp)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .border(
-                                            width = 3.dp,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable {
-                                            coroutineScope.launch {
-                                                learningViewModel.updateWordStatus(
-                                                    currentWord.wordId,
-                                                    "mastered"
-                                                )
-                                            }
-                                            if (words.isNotEmpty() && currentIndex < words.size - 1) {
-                                                currentIndex =
-                                                    (currentIndex + 1).coerceAtMost(words.size - 1)
-                                            } else {
-                                                // Last word completed
-                                                finishSet()
-                                            }
-
-                                            showLearnContent = false
-                                        },
-                                    contentAlignment = Alignment.Center
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
                                 ) {
                                     Text(
-                                        text = "I Know",
-                                        style = MaterialTheme.typography.headlineLarge.copy(
-                                            color = MaterialTheme.colorScheme.secondary
-                                        ),
-                                        modifier = Modifier.align(Alignment.Center)
+                                        text = currentWord.word,
+                                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp),
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
+                                            contentDescription = "Pronunciation",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clickable {
+                                                    // TODO: Handle Pronunciation API if any
+                                                }
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Icon(
+                                            imageVector = if (currentWord.isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                                            contentDescription = "Favourite",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clickable {
+                                                    learningViewModel.toggleFavorite(currentWord.wordId)
+                                                }
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Middle Area
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(0.65f)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        shape = RoundedCornerShape(20.dp)
+                                    )
+                                    .clickable {
+                                        // Update status to "learning"
+                                        coroutineScope.launch {
+                                            learningViewModel.updateWordStatus(
+                                                currentWord.wordId,
+                                                "learning"
+                                            )
+                                        }
+                                        // Show learn content
+                                        showLearnContent = true
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (showLearnContent) {
+                                    // Detailed Learn Content once "Learn" is clicked
+                                    Text(
+                                        text = "Detailed Learn Content TODO!!!!",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                } else {
+                                    // Default eye icon
+                                    Icon(
+                                        imageVector = Icons.Outlined.RemoveRedEye,
+                                        contentDescription = "Tap to see",
+                                        tint = MaterialTheme.colorScheme.tertiary,
+                                        modifier = Modifier.size(26.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.weight(0.1f))
-                                // Show "Next" if learn content is shown, else show "Learn"
-                                if (showLearnContent) {
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Bottom area: "I Know" and "Learn" or "Next"
+                            Box(
+                                modifier = Modifier.weight(0.15f)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    // "I Know" box
                                     Box(
                                         modifier = Modifier
                                             .weight(0.3f)
@@ -385,6 +323,12 @@ fun LearningInPortScreen(
                                                 shape = RoundedCornerShape(20.dp)
                                             )
                                             .clickable {
+                                                coroutineScope.launch {
+                                                    learningViewModel.updateWordStatus(
+                                                        currentWord.wordId,
+                                                        "mastered"
+                                                    )
+                                                }
                                                 if (words.isNotEmpty() && currentIndex < words.size - 1) {
                                                     currentIndex =
                                                         (currentIndex + 1).coerceAtMost(words.size - 1)
@@ -398,47 +342,85 @@ fun LearningInPortScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "Next",
+                                            text = "I Know",
                                             style = MaterialTheme.typography.headlineLarge.copy(
                                                 color = MaterialTheme.colorScheme.secondary
                                             ),
                                             modifier = Modifier.align(Alignment.Center)
                                         )
                                     }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(0.3f)
-                                            .height(80.dp)
-                                            .background(
-                                                color = MaterialTheme.colorScheme.surface,
-                                                shape = RoundedCornerShape(20.dp)
+                                    Spacer(modifier = Modifier.weight(0.1f))
+                                    // Show "Next" if learn content is shown, else show "Learn"
+                                    if (showLearnContent) {
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(0.3f)
+                                                .height(80.dp)
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.surface,
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .border(
+                                                    width = 3.dp,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .clickable {
+                                                    if (words.isNotEmpty() && currentIndex < words.size - 1) {
+                                                        currentIndex =
+                                                            (currentIndex + 1).coerceAtMost(words.size - 1)
+                                                    } else {
+                                                        // Last word completed
+                                                        finishSet()
+                                                    }
+
+                                                    showLearnContent = false
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "Next",
+                                                style = MaterialTheme.typography.headlineLarge.copy(
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                ),
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
-                                            .border(
-                                                width = 3.dp,
-                                                color = MaterialTheme.colorScheme.primary,
-                                                shape = RoundedCornerShape(20.dp)
+                                        }
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(0.3f)
+                                                .height(80.dp)
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.surface,
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .border(
+                                                    width = 3.dp,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .clickable {
+                                                    // Update status to "learning"
+                                                    coroutineScope.launch {
+                                                        learningViewModel.updateWordStatus(
+                                                            currentWord.wordId,
+                                                            "learning"
+                                                        )
+                                                    }
+                                                    // Show learn content
+                                                    showLearnContent = true
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "Learn",
+                                                style = MaterialTheme.typography.headlineLarge.copy(
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                ),
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
-                                            .clickable {
-                                                // Update status to "learning"
-                                                coroutineScope.launch {
-                                                    learningViewModel.updateWordStatus(
-                                                        currentWord.wordId,
-                                                        "learning"
-                                                    )
-                                                }
-                                                // Show learn content
-                                                showLearnContent = true
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "Learn",
-                                            style = MaterialTheme.typography.headlineLarge.copy(
-                                                color = MaterialTheme.colorScheme.secondary
-                                            ),
-                                            modifier = Modifier.align(Alignment.Center)
-                                        )
+                                        }
                                     }
                                 }
                             }

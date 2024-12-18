@@ -8,7 +8,7 @@ import com.example.vocab.model.*
 
 @Database(
     entities = [Vocabulary::class, WordProgress::class, QuizRecord::class, UserProgress::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

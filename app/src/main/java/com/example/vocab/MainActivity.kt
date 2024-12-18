@@ -35,6 +35,7 @@ import java.io.InputStreamReader
 import com.example.vocab.ui.theme.*
 import com.example.vocab.viewmodel.LearningSectionViewModel
 
+
 @Composable
 fun isLandscape(): Boolean {
     val configuration = LocalConfiguration.current
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
 
                             // Profile Sub-Screens
                             composable(ProfileSubScreen.WordBooks.route) { WordBooksScreen(navController = navController) }
-                            composable(ProfileSubScreen.FavouriteWords.route) { FavouriteWordsScreen(navController = navController) }
+                            composable(ProfileSubScreen.FavouriteWords.route) { FavoriteWordsScreen(navController = navController) }
                             composable(ProfileSubScreen.ReStudyWords.route) { ReStudyWordsScreen(navController = navController) }
                             composable(ProfileSubScreen.LearningData.route) { LearningDataScreen(navController = navController) }
                             composable(ProfileSubScreen.Settings.route) { SettingsScreen(navController = navController) }

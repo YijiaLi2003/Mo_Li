@@ -162,8 +162,6 @@ fun LearningInLandScreen(
                         Text(" ", color = MaterialTheme.colorScheme.secondary)
                     }
                 }
-
-                // Middle button (Back)
                 Button(
                     onClick = {
                         if (context is Activity) {
@@ -372,7 +370,7 @@ fun LearningInLandScreen(
                                                     modifier = Modifier
                                                         .size(36.dp)
                                                         .clickable {
-                                                            // TODO Handle save to favourite word list if any
+                                                            learningViewModel.toggleFavorite(currentWordItem.wordId)
                                                         }
                                                 )
                                             }

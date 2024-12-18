@@ -82,6 +82,17 @@ class VocabularyRepository(
         return wordItems
     }
 
+    suspend fun getFavoriteWords(userId: String): List<WordProgress> {
+        return wordProgressDao.getFavoriteWords(userId)
+    }
+
+    suspend fun toggleFavorite(wordId: Int, userId: String) {
+        val wordProgress = wordProgressDao.getWordProgress(wordId, userId)
+        wordProgress?.let {
+            it.isFavorite = !it.isFavorite
+            wordProgressDao.updateWordProgress(it)
+        }
+    }
 
 
 }
