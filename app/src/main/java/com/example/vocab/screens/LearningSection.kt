@@ -2,39 +2,17 @@ package com.example.vocab.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.outlined.Bookmarks
-import androidx.compose.material.icons.outlined.NoteAlt
 import androidx.compose.material.icons.outlined.Quiz
-import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,26 +23,27 @@ import androidx.navigation.NavHostController
 import com.example.vocab.isLandscape
 import com.example.vocab.ui.theme.LearnInLandscape
 import com.example.vocab.ui.theme.LearnInPortrait
-import com.example.vocab.ui.theme.ProfileSubScreen
 import com.example.vocab.ui.theme.Quiz
 import com.example.vocab.viewmodel.LearningSectionViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LearningSection(navController: NavHostController, learningViewModel: LearningSectionViewModel = viewModel()) {
-
+fun LearningSection(
+    navController: NavHostController,
+    learningViewModel: LearningSectionViewModel
+) {
     val bookName by learningViewModel.bookName.collectAsState()
     val progressPercentage by learningViewModel.progressPercentage.collectAsState()
+    val loading by learningViewModel.loading.collectAsState()
+    val desiredCount by learningViewModel.desiredWordCount.collectAsState()
+    val currentWords by learningViewModel.words.collectAsState()
     val scrollState = rememberScrollState()
     val isLandscape = isLandscape()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(text = bookName)
-                },
+                title = { Text(text = bookName) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -81,6 +60,7 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
             )
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,7 +69,6 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Progress Bar
             LinearProgressIndicator(
                 progress = { progressPercentage },
                 modifier = Modifier
@@ -99,9 +78,9 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
             )
+
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = "${(progressPercentage * 100).toInt()}%",
@@ -111,322 +90,141 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
                     modifier = Modifier.align(Alignment.BottomEnd)
                 )
             }
+
             Spacer(modifier = Modifier.height(36.dp))
 
-
-            if (isLandscape){
-
-                // Four square rounded texts in a row
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+            if (loading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .padding(end = 8.dp)
-                            .weight(0.5f)
-                            .aspectRatio(1f)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(25.dp)
-                            )
-                            .clickable { navController.navigate(LearnInLandscape.LandScapeLearn.route)},
-                        contentAlignment = Alignment.Center,
-
-
-                        ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.MenuBook,
-                                contentDescription = "Book",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(36.dp)
-                            )
-                            Text(
-                                text = "Continue Learning",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .padding(start = 8.dp)
-                            .weight(0.5f)
-                            .aspectRatio(1f)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(25.dp)
-                            )
-                            .clickable { navController.navigate(ProfileSubScreen.FavouriteWords.route) },
-                        contentAlignment = Alignment.Center
-
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.Outlined.StarOutline,
-                                contentDescription = "Favourite",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(36.dp)
-                            )
-                            Text(
-                                text = "Favourite Words",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .padding(end = 8.dp)
-                            .weight(0.5f)
-                            .aspectRatio(1f)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(25.dp)
-                            )
-                            .clickable { navController.navigate(ProfileSubScreen.ReStudyWords.route) },
-                        contentAlignment = Alignment.Center
-
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.Outlined.Bookmarks,
-                                contentDescription = "Review List",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(36.dp)
-                            )
-                            Text(
-                                text = "Words Need Review",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .padding(start = 8.dp)
-                            .weight(0.5f)
-                            .aspectRatio(1f)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(25.dp)
-                            )
-                            .clickable { navController.navigate(Quiz.QuizTaking.route) },
-                        contentAlignment = Alignment.Center
-
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.Outlined.Quiz,
-                                contentDescription = "quiz",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(36.dp)
-                            )
-                            Text(
-                                text = "Quiz",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
+                    CircularProgressIndicator()
                 }
+            } else {
+                // If no set chosen yet or user finished the set (words empty), show selection
+                if (desiredCount == null || currentWords.isEmpty()) {
+                    Text(
+                        text = "How many words do you want to learn?",
+                        style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-
-
-            } else{
-                // Four square rounded texts
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp) // Space between the two rows
-                ) {
+                    val counts = listOf(10, 20, 30, 40, 50)
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-
-                        Box(
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .padding(end = 8.dp)
-                                .weight(0.5f)
-                                .aspectRatio(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(25.dp)
-                                )
-                                .clickable { navController.navigate(LearnInPortrait.PortraitLearn.route) },
-                            contentAlignment = Alignment.Center,
-
-
+                        counts.forEach { count ->
+                            Button(
+                                onClick = {
+                                    learningViewModel.setDesiredWordCount(count)
+                                },
+                                modifier = Modifier.padding(horizontal = 4.dp)
                             ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            )
-                            {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.MenuBook,
-                                    contentDescription = "Book",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Text(
-                                    text = "Continue Learning",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                                Text("$count")
                             }
                         }
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .padding(start = 8.dp)
-                                .weight(0.5f)
-                                .aspectRatio(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(25.dp)
-                                )
-                                .clickable { navController.navigate(ProfileSubScreen.FavouriteWords.route) },
-                            contentAlignment = Alignment.Center
-
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            )
-                            {
-                                Icon(
-                                    imageVector = Icons.Outlined.StarOutline,
-                                    contentDescription = "Favourite",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Text(
-                                    text = "Favourite Words",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .padding(end = 8.dp)
-                                .weight(0.5f)
-                                .aspectRatio(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(25.dp)
-                                )
-                                .clickable { navController.navigate(ProfileSubScreen.ReStudyWords.route) },
-                            contentAlignment = Alignment.Center
 
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    // Quiz button
+                    CenteredOption(
+                        icon = Icons.Outlined.Quiz,
+                        text = "Quiz",
+                        onClick = { navController.navigate(Quiz.QuizTaking.route) }
+                    )
+                } else {
+                    // A set has been chosen and not finished
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    if (isLandscape) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                            CenteredOption(
+                                icon = Icons.AutoMirrored.Outlined.MenuBook,
+                                text = "Continue Learning",
+                                modifier = Modifier.weight(0.5f),
+                                onClick = {
+                                    navController.navigate(LearnInLandscape.LandScapeLearn.route)
+                                }
                             )
-                            {
-                                Icon(
-                                    imageVector = Icons.Outlined.Bookmarks,
-                                    contentDescription = "Review List",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Text(
-                                    text = "Words Need Review",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
+                            CenteredOption(
+                                icon = Icons.Outlined.Quiz,
+                                text = "Quiz",
+                                modifier = Modifier.weight(0.5f),
+                                onClick = {
+                                    navController.navigate(Quiz.QuizTaking.route)
+                                }
+                            )
                         }
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .padding(start = 8.dp)
-                                .weight(0.5f)
-                                .aspectRatio(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(25.dp)
-                                )
-                                .clickable { navController.navigate(Quiz.QuizTaking.route) },
-                            contentAlignment = Alignment.Center
-
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                            CenteredOption(
+                                icon = Icons.AutoMirrored.Outlined.MenuBook,
+                                text = "Continue Learning",
+                                modifier = Modifier.weight(0.5f),
+                                onClick = {
+                                    navController.navigate(LearnInPortrait.PortraitLearn.route)
+                                }
                             )
-                            {
-                                Icon(
-                                    imageVector = Icons.Outlined.Quiz,
-                                    contentDescription = "quiz",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Text(
-                                    text = "Quiz",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
+                            CenteredOption(
+                                icon = Icons.Outlined.Quiz,
+                                text = "Quiz",
+                                modifier = Modifier.weight(0.5f),
+                                onClick = {
+                                    navController.navigate(Quiz.QuizTaking.route)
+                                }
+                            )
                         }
                     }
                 }
             }
+        }
+    }
+}
 
 
-
+@Composable
+fun CenteredOption(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .padding(8.dp)
+            .aspectRatio(1f)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(25.dp)
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(36.dp)
+            )
+            Text(
+                text = text,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

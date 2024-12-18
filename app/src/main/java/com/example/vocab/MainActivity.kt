@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
 import com.example.vocab.ui.theme.*
+import com.example.vocab.viewmodel.LearningSectionViewModel
 
 @Composable
 fun isLandscape(): Boolean {
@@ -68,6 +69,9 @@ class MainActivity : ComponentActivity() {
 
                 val isSplashVisible by splashViewModel.isSplashVisible.collectAsState()
                 val navController = rememberNavController()
+
+
+                val learningViewModel: LearningSectionViewModel = viewModel()
 
                 if (isSplashVisible) {
                     SplashScreen()
@@ -119,13 +123,17 @@ class MainActivity : ComponentActivity() {
                             composable(ProfileSubScreen.LearningData.route) { LearningDataScreen(navController = navController) }
                             composable(ProfileSubScreen.Settings.route) { SettingsScreen(navController = navController) }
 
-                            //learning start point
-                            composable(Screen.LearningSection.route) { LearningSection(navController = navController) }
+                            composable(Screen.LearningSection.route) {
+                                LearningSection(navController = navController, learningViewModel = learningViewModel)
+                            }
 
-                            //LearnInLandscape
-                            composable(LearnInLandscape.LandScapeLearn.route) { LearningInLandScreen(navController = navController) }
-                            //LearnInPortrait
-                            composable(LearnInPortrait.PortraitLearn.route) { LearningInPortScreen(navController = navController) }
+                            composable(LearnInLandscape.LandScapeLearn.route) {
+                                LearningInLandScreen(navController = navController, learningViewModel = learningViewModel)
+                            }
+
+                            composable(LearnInPortrait.PortraitLearn.route) {
+                                LearningInPortScreen(navController = navController, learningViewModel = learningViewModel)
+                            }
 
                             //Quiz
                             composable(Quiz.QuizTaking.route) { QuizScreen(navController = navController) }

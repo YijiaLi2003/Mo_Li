@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocab.database.AppDatabase
+import com.example.vocab.model.UserProgress
 import com.example.vocab.model.WordProgress
 import com.example.vocab.repository.VocabularyRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +12,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class WordItem(
     val wordId: Int,
@@ -33,26 +36,43 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
     private val _words = MutableStateFlow<List<WordItem>>(emptyList())
     val words: StateFlow<List<WordItem>> = _words
 
-    // Loading state
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
+
+    private val _desiredWordCount = MutableStateFlow<Int?>(null)
+    val desiredWordCount: StateFlow<Int?> = _desiredWordCount
 
     init {
         val db = AppDatabase.getDatabase(application)
         repository = VocabularyRepository(db.vocabularyDao(), db.wordProgressDao(), db.quizRecordDao())
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid
-        userId = uid ?: "defaultUser"
+        userId = uid ?: "default_user"
 
         viewModelScope.launch {
-            _bookName.value = "TOEFL"
+            // Initially no words chosen
+            _bookName.value = "Select the number of words to learn"
+            _loading.value = false
+        }
+    }
 
-            val unseenWords = repository.getWordsByStatus("unseen", userId, Int.MAX_VALUE)
-            val learningWords = repository.getWordsByStatus("learning", userId, Int.MAX_VALUE)
+    fun setDesiredWordCount(count: Int) {
+        viewModelScope.launch {
+            _loading.value = true
+            _desiredWordCount.value = count
 
-            val combinedProgressList = unseenWords + learningWords
+            val unseenProgressList = repository.getWordsByStatus("unseen", userId, count)
+            println("Fetched unseen words: ${unseenProgressList.size}")
+
+            if (unseenProgressList.isEmpty()) {
+                _words.value = emptyList()
+                recalculateProgress()
+                _loading.value = false
+                return@launch
+            }
+
             val wordItems = mutableListOf<WordItem>()
-            for (wp in combinedProgressList) {
+            for (wp in unseenProgressList) {
                 val vocab = repository.getVocabularyById(wp.wordId)
                 if (vocab != null) {
                     wordItems.add(
@@ -60,25 +80,36 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
                             wordId = wp.wordId,
                             word = vocab.word,
                             translation = vocab.translation,
-                            status = wp.status
+                            status = wp.status // remains 'unseen'
                         )
                     )
                 }
             }
 
             _words.value = wordItems
+            // Set the "bookName" to reflect how many words user selected
+            _bookName.value = "You selected $count words"
             recalculateProgress()
-
-            // Data loaded
             _loading.value = false
+            println("SetDesiredWordCount complete. Words: ${_words.value.size}, loading: false")
         }
     }
 
     private suspend fun recalculateProgress() {
-        val allProgress = repository.getAllWordProgress(userId)
-        val totalWords = allProgress.size
-        val masteredCount = allProgress.count { it.status == "mastered" }
-        val progress = if (totalWords > 0) masteredCount.toFloat() / totalWords else 0f
+        val allProgress = _words.value
+        val count = _desiredWordCount.value
+
+        // Count how many words are not unseen
+        val unseenCount = allProgress.count { it.status == "unseen" }
+        val totalChosen = allProgress.size
+        val nonUnseenCount = totalChosen - unseenCount
+
+        val progress = if (count != null && count > 0) {
+            nonUnseenCount.toFloat() / count
+        } else {
+            0f
+        }
+
         _progressPercentage.value = progress
     }
 
@@ -109,4 +140,15 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
 
         docRef.set(wordProgress)
     }
+
+    fun resetLearningSet() {
+        viewModelScope.launch {
+            _desiredWordCount.value = null
+            _words.value = emptyList()
+            _progressPercentage.value = 0f
+            _bookName.value = "Select the number of words to learn"
+            _loading.value = false
+        }
+    }
+
 }
