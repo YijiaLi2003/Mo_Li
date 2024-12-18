@@ -47,16 +47,12 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         viewModelScope.launch {
             _bookName.value = "TOEFL"
 
-            val unseenProgressList = repository.getWordsByStatus("unseen", userId, Int.MAX_VALUE)
-            for (wp in unseenProgressList) {
-                val updated = wp.copy(status = "learning", lastUpdated = System.currentTimeMillis())
-                repository.updateWordProgress(updated)
-                uploadWordProgressToFirebase(updated)
-            }
+            val unseenWords = repository.getWordsByStatus("unseen", userId, Int.MAX_VALUE)
+            val learningWords = repository.getWordsByStatus("learning", userId, Int.MAX_VALUE)
 
-            val learningWordsProgress = repository.getWordsByStatus("learning", userId, Int.MAX_VALUE)
+            val combinedProgressList = unseenWords + learningWords
             val wordItems = mutableListOf<WordItem>()
-            for (wp in learningWordsProgress) {
+            for (wp in combinedProgressList) {
                 val vocab = repository.getVocabularyById(wp.wordId)
                 if (vocab != null) {
                     wordItems.add(
