@@ -13,6 +13,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = dark_text_white, //text color
     tertiary = dark_text_grey, //second text color
     surface = dark_tint, // block background
+    onSurface = second_dark_tint, // second black tint, on block background
     background = dark_bg,
 )
 
@@ -21,6 +22,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = light_text_black,
     tertiary = light_text_grey,
     surface = light_tint,
+    onSurface = second_light_tint,
     background = light_bg,
 
 
@@ -28,7 +30,6 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color.Black,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
 
     )
 

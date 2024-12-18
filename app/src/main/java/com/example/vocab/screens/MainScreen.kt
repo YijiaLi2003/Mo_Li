@@ -128,7 +128,7 @@ fun ProgressCard(currentWordBook: String, progress: Float) {
                 Text(
                     text = "Current Learning:\n$currentWordBook",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 )
             }
@@ -154,7 +154,7 @@ fun ProgressCard(currentWordBook: String, progress: Float) {
                     .height(12.dp)
                     .clip(MaterialTheme.shapes.small),
                 color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                trackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
             )
         }
     }

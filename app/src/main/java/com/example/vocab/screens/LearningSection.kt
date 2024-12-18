@@ -113,23 +113,6 @@ fun LearningSection(navController: NavHostController, learningViewModel: Learnin
             }
             Spacer(modifier = Modifier.height(36.dp))
 
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(25.dp)
-                    )
-                    .padding(vertical = 30.dp)
-            ) {
-                Text(
-                    text = "Pick one to start",
-                    style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
 
             if (isLandscape){
 
