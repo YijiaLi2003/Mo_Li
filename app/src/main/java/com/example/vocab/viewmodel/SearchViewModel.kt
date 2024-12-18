@@ -34,21 +34,17 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         userId = uid ?: "defaultUser"
 
-        // Initial search with empty query and "all" status
-        searchWords()
     }
 
     fun onQueryChange(newQuery: String) {
         _query.value = newQuery
-        searchWords()
     }
 
     fun onStatusFilterChange(newStatus: String) {
         _statusFilter.value = newStatus
-        searchWords()
     }
 
-    private fun searchWords() {
+    fun performSearch() {
         viewModelScope.launch {
             _loading.value = true
             val queryValue = _query.value
