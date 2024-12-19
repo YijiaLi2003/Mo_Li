@@ -22,7 +22,7 @@ import java.util.*
  */
 class NotificationScheduler {
 
-    private val tag = "NotificationScheduler"
+    private val TAG = "NotificationScheduler"
 
     /**
      * Schedules repeating notifications based on the provided settings.
@@ -32,7 +32,7 @@ class NotificationScheduler {
      */
     fun scheduleNotifications(context: Context, settings: NotificationSettings) {
         if (!settings.enabled) {
-            Log.d(tag, "Notifications are disabled in settings. No notifications scheduled.")
+            Log.d(TAG, "Notifications are disabled in settings. No notifications scheduled.")
             return
         }
 
@@ -61,7 +61,7 @@ class NotificationScheduler {
             intervalMillis,
             pendingIntent
         )
-        Log.d(tag, "Scheduled notifications to start at ${startTime.time} with an interval of $intervalMillis ms.")
+        Log.d(TAG, "Scheduled notifications to start at ${startTime.time} with an interval of $intervalMillis ms.")
     }
 
     /**
@@ -80,9 +80,9 @@ class NotificationScheduler {
         )
         if (pendingIntent != null) {
             alarmManager.cancel(pendingIntent)
-            Log.d(tag, "All scheduled notifications have been canceled.")
+            Log.d(TAG, "All scheduled notifications have been canceled.")
         } else {
-            Log.d(tag, "No scheduled notifications to cancel.")
+            Log.d(TAG, "No scheduled notifications to cancel.")
         }
     }
 }

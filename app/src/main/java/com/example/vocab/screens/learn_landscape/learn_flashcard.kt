@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.KeyboardDoubleArrowDown
 import androidx.compose.material.icons.outlined.KeyboardDoubleArrowUp
 import androidx.compose.material.icons.outlined.StarOutline
@@ -32,6 +33,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -92,6 +95,9 @@ fun LearningInLandScreen(
 
     var showDetails by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    val bookName by learningViewModel.bookName.collectAsState()
+    val progressPercentage by learningViewModel.progressPercentage.collectAsState()
 
     // Enforce landscape orientation
     if (context is Activity) {
@@ -317,83 +323,144 @@ fun LearningInLandScreen(
                     )
                 }
 
+                // after loading...
                 else -> {
                     if (currentIndex in words.indices) {
                         val currentWordItem = words[currentIndex]
 
                         if (!showDetails) {
-                            // Main View: Current Word and Translation
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = currentWordItem.word,
-                                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp),
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    text = currentWordItem.translation,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
 
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                            // Main View: Current Word and two buttons
+
+                            Row{
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .weight(0.7f)
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
-                                        contentDescription = "Pronunciation",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clickable {
-                                                val file = File(context.filesDir, "${currentWordItem.word}.mp3")
-                                                if (file.exists()) {
-                                                    playAudioFromFile(file)
-                                                    Log.d("LearningInLandScreen", "Playing audio for ${currentWordItem.word}")
-                                                } else {
-                                                    Log.e("LearningInLandScreen", "Audio file not found for ${currentWordItem.word}")
-                                                    // Optionally, show a Toast or Snackbar to notify the user
-                                                }
-                                            }
-                                    )
 
-                                    Spacer(modifier = Modifier.width(16.dp))
+                                    //progress bar and percentage
+                                    Column(
+                                        horizontalAlignment = Alignment.Start,
+                                        verticalArrangement = Arrangement.Top
+                                    ) {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = bookName,
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Text(
+                                                text = "${(progressPercentage * 100).toInt()}%",
+                                                style = MaterialTheme.typography.bodyLarge.copy(
+                                                    color = MaterialTheme.colorScheme.tertiary,
+                                                    fontSize = 14.sp
+                                                ),
+                                                modifier = Modifier.align(Alignment.End)
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            LinearProgressIndicator(
+                                                progress = { progressPercentage },
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(8.dp)
+                                                    .clip(RoundedCornerShape(4.dp)),
+                                                color = MaterialTheme.colorScheme.primary,
+                                                trackColor = MaterialTheme.colorScheme.onBackground.copy(
+                                                    alpha = 0.3f
+                                                ),
+                                            )
+                                        }
+                                    }
 
-                                    Icon(
-                                        imageVector = if (currentWordItem.isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
-                                        contentDescription = "Favourite",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clickable {
-                                                coroutineScope.launch {
-                                                    learningViewModel.toggleFavorite(currentWordItem.wordId)
-                                                    Log.d("LearningInLandScreen", "Toggled favorite for ${currentWordItem.word}")
-                                                }
-                                            }
+
+                                    Spacer(modifier = Modifier.height(36.dp))
+
+                                    // word area
+                                    Text(
+                                        text = currentWordItem.word,
+                                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp),
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
+                                            contentDescription = "Pronunciation",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clickable {
+                                                    val file = File(
+                                                        context.filesDir,
+                                                        "${currentWordItem.word}.mp3"
+                                                    )
+                                                    if (file.exists()) {
+                                                        playAudioFromFile(file)
+                                                        Log.d(
+                                                            "LearningInLandScreen",
+                                                            "Playing audio for ${currentWordItem.word}"
+                                                        )
+                                                    } else {
+                                                        Log.e(
+                                                            "LearningInLandScreen",
+                                                            "Audio file not found for ${currentWordItem.word}"
+                                                        )
+                                                        // Optionally, show a Toast or Snackbar to notify the user
+                                                    }
+                                                }
+                                        )
+
+                                        Spacer(modifier = Modifier.width(16.dp))
+
+                                        Icon(
+                                            imageVector = if (currentWordItem.isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                                            contentDescription = "Favourite",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clickable {
+                                                    coroutineScope.launch {
+                                                        learningViewModel.toggleFavorite(currentWordItem.wordId)
+                                                        Log.d(
+                                                            "LearningInLandScreen",
+                                                            "Toggled favorite for ${currentWordItem.word}"
+                                                        )
+                                                    }
+                                                }
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(32.dp))
+
+
+
                                 }
 
-                                Spacer(modifier = Modifier.height(32.dp))
 
                                 // Learn and I Know Buttons
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().weight(0.3f),
+                                    verticalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     // Learn Button
                                     Box(
                                         modifier = Modifier
                                             .weight(0.4f)
-                                            .height(80.dp)
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
                                             .background(
                                                 color = MaterialTheme.colorScheme.surface,
                                                 shape = RoundedCornerShape(20.dp)
@@ -409,9 +476,17 @@ fun LearningInLandScreen(
                                                         currentWordItem.wordId,
                                                         "learning"
                                                     )
-                                                    Log.d("LearningInLandScreen", "Marked ${currentWordItem.word} as learning.")
-                                                    learningViewModel.loadDetailedInfo(currentWordItem.wordId)
-                                                    Log.d("LearningInLandScreen", "Loading detailed info for ${currentWordItem.word}")
+                                                    Log.d(
+                                                        "LearningInLandScreen",
+                                                        "Marked ${currentWordItem.word} as learning."
+                                                    )
+                                                    learningViewModel.loadDetailedInfo(
+                                                        currentWordItem.wordId
+                                                    )
+                                                    Log.d(
+                                                        "LearningInLandScreen",
+                                                        "Loading detailed info for ${currentWordItem.word}"
+                                                    )
                                                 }
                                                 showDetails = true
                                             },
@@ -432,7 +507,8 @@ fun LearningInLandScreen(
                                     Box(
                                         modifier = Modifier
                                             .weight(0.4f)
-                                            .height(80.dp)
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
                                             .background(
                                                 color = MaterialTheme.colorScheme.surface,
                                                 shape = RoundedCornerShape(20.dp)
@@ -448,15 +524,25 @@ fun LearningInLandScreen(
                                                         currentWordItem.wordId,
                                                         "mastered"
                                                     )
-                                                    Log.d("LearningInLandScreen", "Marked ${currentWordItem.word} as mastered.")
+                                                    Log.d(
+                                                        "LearningInLandScreen",
+                                                        "Marked ${currentWordItem.word} as mastered."
+                                                    )
                                                 }
                                                 if (words.isNotEmpty() && currentIndex < words.size - 1) {
-                                                    currentIndex = (currentIndex + 1).coerceAtMost(words.size - 1)
-                                                    Log.d("LearningInLandScreen", "Moved to next word index: $currentIndex")
+                                                    currentIndex =
+                                                        (currentIndex + 1).coerceAtMost(words.size - 1)
+                                                    Log.d(
+                                                        "LearningInLandScreen",
+                                                        "Moved to next word index: $currentIndex"
+                                                    )
                                                 } else {
                                                     // Last word completed
                                                     finishSet()
-                                                    Log.d("LearningInLandScreen", "Finished learning set.")
+                                                    Log.d(
+                                                        "LearningInLandScreen",
+                                                        "Finished learning set."
+                                                    )
                                                 }
                                             },
                                         contentAlignment = Alignment.Center
@@ -505,10 +591,15 @@ fun LearningInLandScreen(
                                     ) {
                                         IconButton(onClick = { showDetails = false }) {
                                             Icon(
-                                                imageVector = Icons.Outlined.KeyboardDoubleArrowUp,
+                                                imageVector = Icons.Outlined.Cancel,
                                                 contentDescription = "Close",
                                                 tint = MaterialTheme.colorScheme.secondary,
                                                 modifier = Modifier.size(36.dp)
+                                                    .border(
+                                                        width = 3.dp,
+                                                        color = MaterialTheme.colorScheme.primary,
+                                                        shape = RoundedCornerShape(20.dp)
+                                                    )
                                             )
                                         }
                                     }
