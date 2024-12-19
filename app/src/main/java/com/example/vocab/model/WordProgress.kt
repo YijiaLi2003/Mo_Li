@@ -25,9 +25,8 @@ data class WordProgress(
     var isCorrect: Boolean = false,
     var status: String = "unseen",  // "unseen", "learning", "mastered"
     var wrongCount: Int = 0,
-    var isFavorite: Boolean = false, // New field
+    var isFavorite: Boolean = false,
     var lastUpdated: Long = System.currentTimeMillis()
 ) {
-    // No-argument constructor for Firebase serialization
     constructor() : this(0, "", 0)
 }

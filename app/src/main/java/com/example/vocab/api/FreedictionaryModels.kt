@@ -16,7 +16,6 @@ data class FreedictionaryResponseItem(
 data class FreedictionaryPhonetic(
     val text: String?,
     val audio: String?
-    // You can include other fields if needed, e.g., sourceUrl, license
 )
 
 @JsonClass(generateAdapter = true)
