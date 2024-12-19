@@ -1,3 +1,4 @@
+// NotificationHelper.kt
 package com.example.vocab.notifications
 
 import android.Manifest
@@ -6,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -16,6 +18,11 @@ object NotificationHelper {
 
     fun showNotification(context: Context, title: String, message: String) {
         val nm = NotificationManagerCompat.from(context)
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("NotificationHelper", "Notification permission not granted")
+            return
+        }
+
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -31,7 +38,7 @@ object NotificationHelper {
         }
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Ensure you have a proper icon
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // ensure proper icon
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -43,7 +50,7 @@ object NotificationHelper {
                 Manifest.permission.POST_NOTIFICATIONS
             )
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                // Permission not granted, skip sending notification
+                // Permission not granted
                 return
             }
         }

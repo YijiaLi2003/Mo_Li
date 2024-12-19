@@ -95,7 +95,7 @@ class VocabularyRepository(
     }
 
     suspend fun getRandomWrongWord(userId: String): WordProgress? {
-        return wordProgressDao.getRandomWrongWord(userId) // This means you add a DAO method to query by isCorrect=false.
+        return wordProgressDao.getRandomWrongWord(userId)
     }
 
 

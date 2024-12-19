@@ -1,23 +1,24 @@
-//MainActivity.kt
 package com.example.vocab
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.example.vocab.dao.VocabularyDao
 import com.example.vocab.database.AppDatabase
 import com.example.vocab.screens.*
@@ -35,19 +36,19 @@ import java.io.InputStreamReader
 import com.example.vocab.ui.theme.*
 import com.example.vocab.viewmodel.LearningSectionViewModel
 
-
 @Composable
 fun isLandscape(): Boolean {
     val configuration = LocalConfiguration.current
     return configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }
 
-
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var vocabularyDao: VocabularyDao
     private lateinit var auth: FirebaseAuth
+
+    // We track if we asked for notification permission
+    private var askedNotificationPermission = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +65,10 @@ class MainActivity : ComponentActivity() {
             importVocabularyFromCsv()
         }
 
+        // Request notification permission if on Android 13+ and not granted yet
+        // We'll request it after we set content, so we have a UI if needed
+        // Alternatively, you can request right away.
+
         setContent {
             Vocab_Theme {
                 val splashViewModel: SplashViewModel = viewModel()
@@ -71,8 +76,31 @@ class MainActivity : ComponentActivity() {
                 val isSplashVisible by splashViewModel.isSplashVisible.collectAsState()
                 val navController = rememberNavController()
 
-
                 val learningViewModel: LearningSectionViewModel = viewModel()
+
+                // Launcher for requesting POST_NOTIFICATIONS permission
+                val requestPermissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { isGranted ->
+                        if (!isGranted) {
+                            Toast.makeText(this, "Notification permission denied. Notifications won't appear.", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, "Notification permission granted.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+
+                // Check and request notification permission
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !askedNotificationPermission) {
+                            askedNotificationPermission = true
+                            // Show a rationale if needed
+                            // If rationale needed, show a dialog before calling requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+                }
 
                 if (isSplashVisible) {
                     SplashScreen()
