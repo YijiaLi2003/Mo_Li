@@ -1,4 +1,3 @@
-// LearningSectionViewModel.kt
 package com.example.vocab.viewmodel
 
 import android.app.Application
@@ -6,20 +5,23 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocab.api.ApiClient
+import com.example.vocab.api.FreedictionaryResponseItem
 import com.example.vocab.database.AppDatabase
 import com.example.vocab.model.WordProgress
 import com.example.vocab.repository.VocabularyRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
 
 data class WordItem(
     val wordId: Int,
@@ -29,12 +31,18 @@ data class WordItem(
     val isFavorite: Boolean = false
 )
 
+data class DetailedWordInfo(
+    val phonetic: String?,
+    val examples: List<String>,
+    val translation: String
+)
+
 class LearningSectionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: VocabularyRepository
     private val userId: String
 
-    private val _bookName = MutableStateFlow("Loading...")
+    private val _bookName = MutableStateFlow("TOEFL")
     val bookName: StateFlow<String> = _bookName
 
     private val _progressPercentage = MutableStateFlow(0f)
@@ -50,9 +58,8 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
     val desiredWordCount: StateFlow<Int?> = _desiredWordCount
 
     private val _favoriteWords = MutableStateFlow<List<WordItem>>(emptyList())
-    val favoriteWords: StateFlow<List<WordItem>> = _favoriteWords
-
-
+    private val _detailedInfo = MutableStateFlow<DetailedWordInfo?>(null)
+    val detailedInfo: StateFlow<DetailedWordInfo?> = _detailedInfo
 
     init {
         val db = AppDatabase.getDatabase(application)
@@ -61,10 +68,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         userId = uid ?: "default_user"
 
-
         viewModelScope.launch {
-            // Initially no words chosen
-            _bookName.value = "TOEFL"
             _loading.value = false
         }
     }
@@ -75,7 +79,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             _desiredWordCount.value = count
 
             val unseenProgressList = repository.getWordsByStatus("unseen", userId, count)
-            println("Fetched unseen words: ${unseenProgressList.size}")
+            Log.d("LearningSectionViewModel", "Fetched unseen words: ${unseenProgressList.size}")
 
             if (unseenProgressList.isEmpty()) {
                 _words.value = emptyList()
@@ -101,10 +105,11 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             }
 
             _words.value = wordItems
-//            _bookName.value = "You selected $count words"
 
-            // Fetch and cache pronunciation audio for each word (if available)
-            cacheAudioForWords(wordItems)
+            withContext(Dispatchers.IO) {
+                cacheAudioForWords(wordItems)
+                cacheDefinitionsForWords(wordItems)
+            }
 
             recalculateProgress()
             _loading.value = false
@@ -115,15 +120,13 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         withContext(Dispatchers.IO) {
             for (item in wordItems) {
                 try {
-                    val definitions = ApiClient.dictionaryApi.getWordDefinition(item.word)
-                    // Try to find an audio link
+                    val definitions = loadDefinitionData(item.word)
                     val audioUrl = definitions
                         .flatMap { it.phonetics ?: emptyList() }
                         .firstOrNull { it.audio?.isNotEmpty() == true }
                         ?.audio
 
                     if (!audioUrl.isNullOrBlank()) {
-                        // Download and save locally
                         downloadAndSaveAudio(item.word, audioUrl)
                     }
                 } catch (e: Exception) {
@@ -133,9 +136,20 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
+    private suspend fun cacheDefinitionsForWords(wordItems: List<WordItem>) {
+        withContext(Dispatchers.IO) {
+            for (item in wordItems) {
+                try {
+                    loadDefinitionData(item.word) // Will cache if not cached
+                } catch (e: Exception) {
+                    Log.e("DefinitionCache", "Error caching definition for ${item.word}: ${e.message}")
+                }
+            }
+        }
+    }
+
     private fun downloadAndSaveAudio(word: String, url: String) {
         try {
-            // Ensure the URL starts with "http" or "https"
             var finalUrl = url.trim()
             if (finalUrl.startsWith("//")) {
                 finalUrl = "https:$finalUrl"
@@ -169,17 +183,107 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-
     private fun getAudioFileForWord(word: String): File {
         val dir = getApplication<Application>().filesDir
         return File(dir, "$word.mp3")
+    }
+
+    private fun getDefinitionCacheFile(word: String): File {
+        val dir = getApplication<Application>().filesDir
+        return File(dir, "$word-definition.json")
+    }
+
+    private suspend fun loadDefinitionData(word: String): List<FreedictionaryResponseItem> {
+        return withContext(Dispatchers.IO) {
+            val file = getDefinitionCacheFile(word)
+            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+            val adapter = moshi.adapter<List<FreedictionaryResponseItem>>(
+                Types.newParameterizedType(List::class.java, FreedictionaryResponseItem::class.java)
+            )
+
+            if (file.exists()) {
+                val json = file.readText()
+                Log.d("LearningSectionViewModel", "Loading cached definition for $word")
+                val data = adapter.fromJson(json)
+                if (!data.isNullOrEmpty()) {
+                    Log.d("LearningSectionViewModel", "Loaded cached definition for $word")
+                    return@withContext data
+                } else {
+                    Log.e("LearningSectionViewModel", "Cached definition is empty for $word")
+                }
+            }
+
+            try {
+                Log.d("LearningSectionViewModel", "Fetching definition from API for $word")
+                val fetched = ApiClient.dictionaryApi.getWordDefinition(word)
+                if (fetched.isNotEmpty()) {
+                    val json = adapter.toJson(fetched)
+                    file.writeText(json)
+                    Log.d("LearningSectionViewModel", "Cached definition for $word")
+                } else {
+                    Log.e("LearningSectionViewModel", "No definition fetched for $word")
+                }
+                return@withContext fetched
+            } catch (e: Exception) {
+                Log.e("LearningSectionViewModel", "API call failed for $word: ${e.message}")
+                return@withContext emptyList<FreedictionaryResponseItem>()
+            }
+        }
+    }
+
+    suspend fun loadDetailedInfo(wordId: Int) {
+        val wItem = _words.value.find { it.wordId == wordId } ?: return
+        val word = wItem.word
+        _detailedInfo.value = null
+
+        val definitions = try {
+            loadDefinitionData(word)
+        } catch (e: Exception) {
+            Log.e("LearningSectionViewModel", "Error loading definitions for $word: ${e.message}")
+            emptyList()
+        }
+
+        val firstItem = definitions.firstOrNull()
+        val phonetic: String? = firstItem?.phonetic ?: firstItem?.phonetics?.firstOrNull()?.text
+        val exampleList = mutableListOf<String>()
+        firstItem?.meanings?.forEach { meaning ->
+            meaning.definitions.forEach { def ->
+                def.example?.let { exampleList.add(it) }
+            }
+        }
+
+        val translation = wItem.translation
+
+        // Log the fetched data
+        Log.d("LearningSectionViewModel", "Word: $word")
+        Log.d("LearningSectionViewModel", "Phonetic: $phonetic")
+        Log.d("LearningSectionViewModel", "Examples: $exampleList")
+
+        // If we got no data at all (firstItem == null), then just show translation.
+        // Otherwise, show what we have, even if phonetic or examples are empty.
+        val info = if (firstItem == null) {
+            // No data from API, fallback
+            DetailedWordInfo(
+                phonetic = null,
+                examples = emptyList(),
+                translation = translation
+            )
+        } else {
+            // We have some data, show phonetic/examples if available
+            DetailedWordInfo(
+                phonetic = phonetic,
+                examples = exampleList,
+                translation = translation
+            )
+        }
+
+        _detailedInfo.value = info
     }
 
     private fun recalculateProgress() {
         val allProgress = _words.value
         val count = _desiredWordCount.value
 
-        // Count how many words are not unseen
         val unseenCount = allProgress.count { it.status == "unseen" }
         val totalChosen = allProgress.size
         val nonUnseenCount = totalChosen - unseenCount
@@ -231,7 +335,6 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    // New function to load favorite words
     private fun loadFavoriteWords() {
         viewModelScope.launch {
             val favoriteWordProgressList = repository.getFavoriteWords(userId)
@@ -249,7 +352,6 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    // New function to toggle favorite status
     fun toggleFavorite(wordId: Int) {
         viewModelScope.launch {
             val wordProgress = repository.getWordProgress(wordId, userId)
@@ -258,14 +360,11 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
                 val updatedWordProgress = wordProgress.copy(isFavorite = newFavoriteStatus)
                 repository.updateWordProgress(updatedWordProgress)
                 uploadWordProgressToFirebase(updatedWordProgress)
-                // Update the _words list
                 _words.value = _words.value.map { item ->
                     if (item.wordId == wordId) item.copy(isFavorite = newFavoriteStatus) else item
                 }
-                // Reload favorite words
                 loadFavoriteWords()
             }
         }
     }
-
 }

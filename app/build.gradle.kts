@@ -80,6 +80,8 @@ dependencies {
     // Retrofit and Converter
     implementation(libs.squareup.retrofit2)
     implementation(libs.squareup.retrofit2.converter.moshi)
+    implementation(libs.squareup.moshi.kotlin)
+
 
     // OkHttp for logging (optional)
     implementation(libs.squareup.okhttp3.logging.interceptor)

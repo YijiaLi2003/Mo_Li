@@ -28,7 +28,7 @@ class NotificationReceiver : BroadcastReceiver() {
             if (wrongWord != null) {
                 val vocab = repository.getVocabularyById(wrongWord.wordId)
                 if (vocab != null) {
-                    val title = "Review '${vocab.word}'"
+                    val title = vocab.word
                     val message = "Meaning: ${vocab.translation}, wrong count: ${wrongWord.wrongCount}"
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showNotification(context, title, message)

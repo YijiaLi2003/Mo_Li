@@ -39,7 +39,6 @@ interface WordProgressDao {
     suspend fun getFavoriteWords(userId: String): List<WordProgress>
 
 
-    @Query("SELECT * FROM word_progress WHERE status = 'learning' AND userId = :userId ORDER BY RANDOM() LIMIT 1")
+    @Query("SELECT * FROM word_progress WHERE isCorrect = 0 AND userId = :userId ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomWrongWord(userId: String): WordProgress?
-
 }

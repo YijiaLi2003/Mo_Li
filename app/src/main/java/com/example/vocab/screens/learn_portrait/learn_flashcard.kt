@@ -32,9 +32,9 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 import android.media.MediaPlayer
 import java.io.File
+import com.example.vocab.api.FreedictionaryResponseItem
 
 fun playAudioFromFile(file: File) {
     val mediaPlayer = MediaPlayer()
@@ -42,7 +42,6 @@ fun playAudioFromFile(file: File) {
     mediaPlayer.prepare()
     mediaPlayer.start()
 }
-
 
 private suspend fun fetchProgressFromDatabase(context: android.content.Context): Int? {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return null
@@ -72,6 +71,7 @@ fun LearningInPortScreen(
     val progressPercentage by learningViewModel.progressPercentage.collectAsState()
     val words by learningViewModel.words.collectAsState()
     val loading by learningViewModel.loading.collectAsState()
+    val detailedInfo by learningViewModel.detailedInfo.collectAsState()
 
     // State for currentIndex
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -80,12 +80,10 @@ fun LearningInPortScreen(
     // Learn button can trigger the content to show up in middle section
     var showLearnContent by rememberSaveable { mutableStateOf(false) }
 
-    // Helper function to finish the learning set
     fun finishSet() {
         coroutineScope.launch {
             learningViewModel.resetLearningSet()
         }
-        // Reset currentIndex to 0 after finishing the set
         currentIndex = 0
         navController.navigate(Screen.LearningSection.route) {
             popUpTo(Screen.LearningSection.route) { inclusive = true }
@@ -147,9 +145,7 @@ fun LearningInPortScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             LinearProgressIndicator(
-                                progress = {
-                                    progressPercentage // Correct: Float value
-                                },
+                                progress = { progressPercentage },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(8.dp)
@@ -180,7 +176,6 @@ fun LearningInPortScreen(
             )
         }
     ) { innerPadding ->
-        // Main content container
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -201,7 +196,6 @@ fun LearningInPortScreen(
                 }
 
                 else -> {
-                    // Main Content
                     val currentWord = words.getOrNull(currentIndex)
 
                     if (currentWord == null) {
@@ -222,7 +216,6 @@ fun LearningInPortScreen(
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
                             // Top Area: Current Word
                             Box(
                                 modifier = Modifier.weight(0.2f)
@@ -250,8 +243,6 @@ fun LearningInPortScreen(
                                                 val file = File(context.filesDir, "${currentWord.word}.mp3")
                                                 if (file.exists()) {
                                                     playAudioFromFile(file)
-                                                } else {
-                                                    // File not cached, optionally fetch again or show error
                                                 }
                                             }
                                         )
@@ -282,27 +273,71 @@ fun LearningInPortScreen(
                                         shape = RoundedCornerShape(20.dp)
                                     )
                                     .clickable {
-                                        // Update status to "learning"
+                                        // Update status to "learning" and show learn content
                                         coroutineScope.launch {
                                             learningViewModel.updateWordStatus(
                                                 currentWord.wordId,
                                                 "learning"
                                             )
+                                            // Now load detailed info
+                                            learningViewModel.loadDetailedInfo(currentWord.wordId)
                                         }
-                                        // Show learn content
                                         showLearnContent = true
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (showLearnContent) {
-                                    // Detailed Learn Content once "Learn" is clicked
-                                    Text(
-                                        text = "Detailed Learn Content TODO!!!!",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                                    detailedInfo?.let { info ->
+                                        // Display phonetic, translation, and examples in a nice Column
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(16.dp)
+                                        ) {
+                                            Text(
+                                                text = "Phonetic: ${info.phonetic}",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+
+                                            Text(
+                                                text = "Translation: ${info.translation}",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+
+                                            if (info.examples.isNotEmpty()) {
+                                                Text(
+                                                    text = "Examples:",
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                )
+                                                info.examples.forEach { example ->
+                                                    Text(
+                                                        text = "- $example",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = MaterialTheme.colorScheme.secondary
+                                                    )
+                                                }
+                                            } else {
+                                                Text(
+                                                    text = "No example sentences found.",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                )
+                                            }
+                                        }
+                                    } ?: run {
+                                        Text(
+                                            text = "Loading detailed info...",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
                                 } else {
-                                    // Default eye icon
+                                    // Default view
                                     Icon(
                                         imageVector = Icons.Outlined.RemoveRedEye,
                                         contentDescription = "Tap to see",
@@ -387,7 +422,6 @@ fun LearningInPortScreen(
                                                         // Last word completed
                                                         finishSet()
                                                     }
-
                                                     showLearnContent = false
                                                 },
                                             contentAlignment = Alignment.Center
@@ -421,9 +455,12 @@ fun LearningInPortScreen(
                                                             currentWord.wordId,
                                                             "learning"
                                                         )
+
+                                                        // Now load detailed info
+                                                        learningViewModel.loadDetailedInfo(currentWord.wordId)
+                                                        showLearnContent = true
                                                     }
-                                                    // Show learn content
-                                                    showLearnContent = true
+
                                                 },
                                             contentAlignment = Alignment.Center
                                         ) {
