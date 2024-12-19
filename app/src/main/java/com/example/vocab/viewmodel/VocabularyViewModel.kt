@@ -44,13 +44,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             val existingProgress = repository.getWordProgress(wordId, userId)
             val newProgress = existingProgress?.copy(
                 isCorrect = isCorrect,
-                quizAttempts = existingProgress.quizAttempts + 1,
                 lastUpdated = System.currentTimeMillis()
             ) ?: WordProgress(
                 wordId = wordId,
                 userId = userId,
                 isCorrect = isCorrect,
-                quizAttempts = 1
             )
             repository.insertWordProgress(newProgress)
         }

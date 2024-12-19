@@ -20,17 +20,14 @@ import androidx.room.PrimaryKey
 data class WordProgress(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    var quizId: Int? = null,
     var userId: String = "",
     var wordId: Int = 0,
     var isCorrect: Boolean = false,
     var status: String = "unseen",  // "unseen", "learning", "mastered"
-    var quizAttempts: Int = 0,
     var wrongCount: Int = 0,
-    var needsReview: Boolean = false,
     var isFavorite: Boolean = false, // New field
     var lastUpdated: Long = System.currentTimeMillis()
 ) {
     // No-argument constructor for Firebase serialization
-    constructor() : this(0, null, "", 0)
+    constructor() : this(0, "", 0)
 }
