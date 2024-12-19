@@ -12,12 +12,14 @@ private val Context.settingsDataStore by preferencesDataStore(name = "notificati
 
 private val KEY_ENABLED = booleanPreferencesKey("notifications_enabled")
 private val KEY_INTERVAL = intPreferencesKey("notifications_interval_minutes")
+private val KEY_DARK_MODE = booleanPreferencesKey("dark_mode")
 
 fun loadNotificationSettings(context: Context): Flow<NotificationSettings> {
     return context.settingsDataStore.data.map { prefs ->
         NotificationSettings(
             enabled = prefs[KEY_ENABLED] ?: false,
-            intervalMinutes = prefs[KEY_INTERVAL] ?: 60
+            intervalMinutes = prefs[KEY_INTERVAL] ?: 60,
+            darkMode = prefs[KEY_DARK_MODE] ?: false
         )
     }
 }
@@ -26,5 +28,6 @@ suspend fun saveNotificationSettings(context: Context, settings: NotificationSet
     context.settingsDataStore.edit { prefs ->
         prefs[KEY_ENABLED] = settings.enabled
         prefs[KEY_INTERVAL] = settings.intervalMinutes
+        prefs[KEY_DARK_MODE] = settings.darkMode
     }
 }

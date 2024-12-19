@@ -45,3 +45,7 @@ sealed class LearnInPortrait(val route: String){
 sealed class Quiz(val route: String){
     data object QuizTaking : Quiz("quiz_taking")
 }
+
+sealed class SettingsSubScreen(val route: String){
+    data object NotificationSub : SettingsSubScreen("notification-sub")
+}

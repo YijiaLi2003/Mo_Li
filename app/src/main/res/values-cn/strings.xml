@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MoLi学词</string>
+    <string name="splash">知道你在努力</string>
+
+</resources>
+
+
+<!--    Text(text = stringResource(R.string.app_name))-->

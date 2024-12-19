@@ -64,7 +64,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
 
         viewModelScope.launch {
             // Initially no words chosen
-            _bookName.value = "Select the number of words to learn"
+            _bookName.value = "TOEFL"
             _loading.value = false
         }
     }
@@ -101,7 +101,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             }
 
             _words.value = wordItems
-            _bookName.value = "You selected $count words"
+//            _bookName.value = "You selected $count words"
 
             // Fetch and cache pronunciation audio for each word (if available)
             cacheAudioForWords(wordItems)
@@ -226,7 +226,7 @@ class LearningSectionViewModel(application: Application) : AndroidViewModel(appl
             _desiredWordCount.value = null
             _words.value = emptyList()
             _progressPercentage.value = 0f
-            _bookName.value = "Select the number of words you want to learn"
+            _bookName.value = "TOEFL"
             _loading.value = false
         }
     }

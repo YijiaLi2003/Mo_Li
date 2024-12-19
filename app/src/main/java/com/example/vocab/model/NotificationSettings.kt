@@ -3,5 +3,6 @@ package com.example.vocab.model
 
 data class NotificationSettings(
     val enabled: Boolean = false,
-    val intervalMinutes: Int = 60 // default 1 hour
+    val intervalMinutes: Int = 60, // default 1 hour
+    val darkMode: Boolean = false
 )

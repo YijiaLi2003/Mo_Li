@@ -25,6 +25,7 @@ import com.example.vocab.screens.*
 import com.example.vocab.screens.profile_sub.*
 import com.example.vocab.screens.learn_landscape.*
 import com.example.vocab.screens.learn_portrait.*
+import com.example.vocab.screens.settings_sub.NotificationSubScreen
 import com.example.vocab.viewmodel.SplashViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.opencsv.CSVParserBuilder
@@ -35,6 +36,7 @@ import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
 import com.example.vocab.ui.theme.*
 import com.example.vocab.viewmodel.LearningSectionViewModel
+import com.example.vocab.viewmodel.SettingsViewModel
 
 @Composable
 fun isLandscape(): Boolean {
@@ -65,12 +67,17 @@ class MainActivity : ComponentActivity() {
             importVocabularyFromCsv()
         }
 
+
         // Request notification permission if on Android 13+ and not granted yet
         // We'll request it after we set content, so we have a UI if needed
         // Alternatively, you can request right away.
 
         setContent {
-            Vocab_Theme {
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val settings by settingsViewModel.settingsFlow.collectAsState()
+            val darkModeEnabled = settings.darkMode
+
+            Vocab_Theme(darkTheme = darkModeEnabled) {
                 val splashViewModel: SplashViewModel = viewModel()
 
                 val isSplashVisible by splashViewModel.isSplashVisible.collectAsState()
@@ -164,6 +171,9 @@ class MainActivity : ComponentActivity() {
 
                             //Quiz
                             composable(Quiz.QuizTaking.route) { QuizScreen(navController = navController) }
+
+                            // notification sub screen
+                            composable(SettingsSubScreen.NotificationSub.route) { NotificationSubScreen(navController = navController) }
                         }
                     }
 

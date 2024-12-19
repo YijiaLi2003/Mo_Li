@@ -3,6 +3,7 @@ package com.example.vocab.screens
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -176,6 +177,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(
                                             ProfileSubScreen.WordBooks.route)},
                                     contentAlignment = Alignment.Center,
@@ -191,7 +197,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.AutoMirrored.Outlined.MenuBook,
                                             contentDescription = "Book",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 10.dp)
                                         )
                                         Text(
                                             text = "Word Books",
@@ -211,6 +217,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(ProfileSubScreen.FavouriteWords.route) },
                                     contentAlignment = Alignment.Center
 
@@ -225,7 +236,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.StarOutline,
                                             contentDescription = "Favourite",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 10.dp)
                                         )
                                         Text(
                                             text = "Favourite Words",
@@ -245,6 +256,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(ProfileSubScreen.ReStudyWords.route) },
                                     contentAlignment = Alignment.Center
 
@@ -259,7 +275,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.Bookmarks,
                                             contentDescription = "Review List",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 10.dp)
                                         )
                                         Text(
                                             text = "Words Need Review",
@@ -278,46 +294,17 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
 
                                 Box(
                                     modifier = Modifier
-                                        .padding(start = 16.dp)
                                         .padding(end = 8.dp)
+                                        .padding(start = 16.dp)
                                         .weight(0.5f)
                                         .aspectRatio(1.618f)
                                         .background(
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
-                                        .clickable { navController.navigate(ProfileSubScreen.LearningData.route) },
-                                    contentAlignment = Alignment.Center,
-
-                                    ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Outlined.DataThresholding,
-                                            contentDescription = "learning data",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
-                                        )
-                                        Text(
-                                            text = "Learning Data",
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .padding(start = 8.dp)
-                                        .weight(0.5f)
-                                        .aspectRatio(1.618f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
                                             shape = RoundedCornerShape(20.dp)
                                         )
                                         .clickable { navController.navigate(ProfileSubScreen.Settings.route) },
@@ -333,7 +320,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.Settings,
                                             contentDescription = "settings",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 10.dp)
                                         )
                                         Text(
                                             text = "Settings",
@@ -341,6 +328,22 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                             modifier = Modifier.fillMaxWidth()
                                         )
+                                    }
+                                }
+                                // serve as a placeholder
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 16.dp)
+                                        .padding(start = 8.dp)
+                                        .weight(0.5f)
+                                        .aspectRatio(1.618f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.background,
+                                        )
+                                ) {
+                                    Row(modifier = Modifier.fillMaxWidth(),)
+                                    {
+                                        Text(text = "")
                                     }
                                 }
                                 // serve as a placeholder
@@ -383,6 +386,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(
                                             ProfileSubScreen.WordBooks.route)},
                                     contentAlignment = Alignment.Center,
@@ -398,7 +406,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.AutoMirrored.Outlined.MenuBook,
                                             contentDescription = "Book",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 8.dp)
                                         )
                                         Text(
                                             text = "Word Books",
@@ -418,6 +426,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(ProfileSubScreen.FavouriteWords.route) },
                                     contentAlignment = Alignment.Center
 
@@ -432,7 +445,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.StarOutline,
                                             contentDescription = "Favourite",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 8.dp)
                                         )
                                         Text(
                                             text = "Favourite Words",
@@ -458,6 +471,11 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
                                         .clickable { navController.navigate(ProfileSubScreen.ReStudyWords.route) },
                                     contentAlignment = Alignment.Center
 
@@ -472,7 +490,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.Bookmarks,
                                             contentDescription = "Review List",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 8.dp)
                                         )
                                         Text(
                                             text = "Words Need Review",
@@ -484,51 +502,17 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                 }
                                 Box(
                                     modifier = Modifier
-                                        .padding(start = 8.dp)
                                         .padding(end = 16.dp)
+                                        .padding(start = 8.dp)
                                         .weight(0.5f)
                                         .aspectRatio(1.618f)
                                         .background(
                                             color = MaterialTheme.colorScheme.surface,
                                             shape = RoundedCornerShape(20.dp)
                                         )
-                                        .clickable { navController.navigate(ProfileSubScreen.LearningData.route) },
-                                    contentAlignment = Alignment.Center,
-
-                                    ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Outlined.DataThresholding,
-                                            contentDescription = "learning data",
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
-                                        )
-                                        Text(
-                                            text = "Learning Data",
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 16.dp)
-                                        .padding(start = 8.dp)
-                                        .weight(0.5f)
-                                        .aspectRatio(1.618f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary,
                                             shape = RoundedCornerShape(20.dp)
                                         )
                                         .clickable { navController.navigate(ProfileSubScreen.Settings.route) },
@@ -544,7 +528,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             imageVector = Icons.Outlined.Settings,
                                             contentDescription = "settings",
                                             tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.size(36.dp)
+                                            modifier = Modifier.size(36.dp).padding(start = 8.dp)
                                         )
                                         Text(
                                             text = "Settings",
@@ -554,6 +538,12 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                         )
                                     }
                                 }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                //placeholder
                                 Box(
                                     modifier = Modifier
                                         .padding(start = 16.dp)
@@ -564,8 +554,7 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                             color = MaterialTheme.colorScheme.background,
                                         ),
                                     contentAlignment = Alignment.Center,
-
-                                    ) {
+                                ) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
@@ -574,6 +563,27 @@ fun ProfileScreen(auth: FirebaseAuth, navController: NavController) {
                                     {
                                         Text(text = "") // serve as a placeholder
                                     }
+                                }
+                                //placeholder
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp)
+                                        .padding(end = 8.dp)
+                                        .weight(0.5f)
+                                        .aspectRatio(1.618f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.background,
+                                        ),
+                                    contentAlignment = Alignment.Center,
+                                    ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    )
+                                        {
+                                            Text(text = "") // serve as a placeholder
+                                        }
                                 }
 
                             }

@@ -113,6 +113,9 @@ dependencies {
     // List saver
     implementation(libs.androidx.runtime.saveable)
 
+    //datastore
+    implementation (libs.androidx.datastore.preferences)
+
     // Testing libraries
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
