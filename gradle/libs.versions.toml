@@ -36,6 +36,8 @@ uiText = "1.7.6"
 datastoreCoreAndroid = "1.1.1"
 datastore = "1.1.1"
 moshi = "1.14.0"
+work = "2.10.0"
+workRuntimeKtx = "2.8.1"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -80,6 +82,7 @@ google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

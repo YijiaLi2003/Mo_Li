@@ -37,6 +37,7 @@ import java.io.InputStreamReader
 import com.example.vocab.ui.theme.*
 import com.example.vocab.viewmodel.LearningSectionViewModel
 import com.example.vocab.viewmodel.SettingsViewModel
+import com.example.vocab.workers.SyncManager
 
 @Composable
 fun isLandscape(): Boolean {
@@ -67,6 +68,8 @@ class MainActivity : ComponentActivity() {
             importVocabularyFromCsv()
         }
 
+        // Schedule the periodic data synchronization
+        SyncManager.schedulePeriodicSync(this)
 
         // Request notification permission if on Android 13+ and not granted yet
         // We'll request it after we set content, so we have a UI if needed

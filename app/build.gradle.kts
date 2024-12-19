@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.work.runtime.ktx)
+
 
     // Room components
     implementation(libs.androidx.room.runtime)

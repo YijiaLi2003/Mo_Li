@@ -41,4 +41,5 @@ interface WordProgressDao {
 
     @Query("SELECT * FROM word_progress WHERE isCorrect = 0 AND userId = :userId ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomWrongWord(userId: String): WordProgress?
+
 }
