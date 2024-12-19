@@ -303,31 +303,11 @@ fun LearningInPortScreen(
                                             )
 
                                             Text(
-                                                text = "Translation: ${info.translation}",
+                                                text = info.translation,
                                                 style = MaterialTheme.typography.titleMedium,
                                                 color = MaterialTheme.colorScheme.secondary
                                             )
 
-                                            if (info.examples.isNotEmpty()) {
-                                                Text(
-                                                    text = "Examples:",
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    color = MaterialTheme.colorScheme.secondary
-                                                )
-                                                info.examples.forEach { example ->
-                                                    Text(
-                                                        text = "- $example",
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        color = MaterialTheme.colorScheme.secondary
-                                                    )
-                                                }
-                                            } else {
-                                                Text(
-                                                    text = "No example sentences found.",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.secondary
-                                                )
-                                            }
                                         }
                                     } ?: run {
                                         Text(
